@@ -1,12 +1,13 @@
 from fastapi import FastAPI, File, UploadFile, Form, Body
 from fastapi.responses import HTMLResponse, StreamingResponse, JSONResponse
 from fastapi.middleware.cors import CORSMiddleware  # Import CORS middleware
-from typing import Union
+from typing import Union, Optional  # Import Optional for type hinting
 import io
 from agent_manager import supervisor_agent, handle_conversation  # Import supervisor_agent and handle_conversation
-from settings import get_settings_ui, update_settings  # Import settings functions
+from settings import get_settings_ui, update_settings, load_whisper_model_name  # Import settings functions
 import random
 import uuid
+import whisper  # Import the Whisper library for speech-to-text
 
 from agents import RawResponsesStreamEvent
 from openai.types.responses import ResponseContentPartDoneEvent, ResponseTextDeltaEvent
@@ -35,23 +36,31 @@ app.add_middleware(
     allow_headers=["*"],  # Allow all headers
 )
 
-# Placeholder function for audio transcription
+# Load the Whisper model dynamically
+def load_whisper_model():
+    model_name = load_whisper_model_name()
+    return whisper.load_model(model_name)
+
+whisper_model = load_whisper_model()
+
+# Function to transcribe audio using Whisper
 def transcribe_audio(audio_file: io.BytesIO) -> str:
-    # Replace this with actual transcription logic (e.g., using a library like SpeechRecognition or Whisper)
-    return "Transcribed text from audio"
-
-# Function to get LLM agent response
-async def get_llm_response(input_text: str) -> str:
-    # Use the supervisor_agent to process the input text
-    result = await supervisor_agent.process_input(input_text)
-    return result.final_output
-
-
-@app.post("/process-input/")
-async def process_input(payload: dict = Body(...)):
     """
-    Handles the conversation flow based on the provided JSON schema.
+    Transcribes audio using the Whisper model.
     """
+    audio_file.seek(0)  # Ensure the file pointer is at the beginning
+    audio_data = audio_file.read()
+    with open("temp_audio.wav", "wb") as temp_file:
+        temp_file.write(audio_data)
+    result = whisper_model.transcribe("temp_audio.wav")
+    print(result)
+    return result.get("text", "Transcription failed")
+
+async def process(payload: dict) -> dict:
+    """
+    Process the conversation based on the provided payload.
+    """
+    # Handle the conversation using the supervisor agent
     response = await handle_conversation(payload)
 
     # Handle errors returned by the conversation handler
@@ -74,17 +83,55 @@ async def process_input(payload: dict = Body(...)):
         "pain_points": response.get("pain_points"),
         "good_points": response.get("good_points"),
     }
+ 
+@app.post("/process-input/")
+async def process_input(payload: dict = Body(...)):
+    """
+    Handles the conversation flow based on the provided JSON schema.
+    """
+    return await process(payload)
+    
+
+@app.post("/audio-input/")
+async def audio_input(file: UploadFile = File(...), user_id: str = Form(...)):
+    """
+    Endpoint to handle audio input, transcribe it to text, and process it with the AI.
+    """
+    # Read the uploaded audio file
+    audio_bytes = io.BytesIO(await file.read())
+    
+    # Transcribe the audio to text
+    transcribed_text = transcribe_audio(audio_bytes)
+    
+    # Create a payload for the conversation handler
+    payload = {
+        "type": "prompt",
+        "user_id": user_id,
+        "data": transcribed_text
+    }
+
+    return await process(payload)
 
 @app.get("/settings/", response_class=HTMLResponse)
 async def settings_ui():
     return get_settings_ui(supervisor_agent)
 
 @app.post("/settings/")
-async def settings_update(prompt: str = Form(...), final_output_prompt: str = Form(...)):
+async def settings_update(
+    prompt: str = Form(...), 
+    final_output_prompt: str = Form(...), 
+    whisper_model_param: Optional[str] = Form(None)  # Make whisper_model_param optional
+):
     """
-    Endpoint to update the settings for the supervisor and final output agent.
+    Endpoint to update the settings for the supervisor, final output agent, and Whisper model.
     """
-    return await update_settings(supervisor_agent, prompt, final_output_prompt)
+    global whisper_model  # Declare whisper_model as global
+    if whisper_model_param:  # Only update the Whisper model if a value is provided
+        response = await update_settings(supervisor_agent, prompt, final_output_prompt, whisper_model_param)
+        whisper_model = load_whisper_model()  # Reload the Whisper model with the new settings
+    else:
+        response = await update_settings(supervisor_agent, prompt, final_output_prompt, "")
+    return response
 
 @app.post("/test-random-user/")
 async def test_random_user(first_prompt: str = Form(...)):

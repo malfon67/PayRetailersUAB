@@ -9,6 +9,7 @@ os.makedirs(SETTINGS_DIR, exist_ok=True)
 
 SUPERVISOR_PROMPT_FILE = os.path.join(SETTINGS_DIR, "supervisor_prompt.txt")
 FINAL_OUTPUT_PROMPT_FILE = os.path.join(SETTINGS_DIR, "final_output_prompt.txt")
+WHISPER_MODEL_FILE = os.path.join(SETTINGS_DIR, "whisper_model.txt")
 
 # Load a prompt from a file
 def load_prompt(file_path: str, default: str) -> str:
@@ -22,6 +23,14 @@ def load_prompt(file_path: str, default: str) -> str:
 def save_prompt(file_path: str, prompt: str):
     with open(file_path, "w") as file:
         file.write(prompt)
+
+# Load the Whisper model name from the settings file
+def load_whisper_model_name(default: str = "base") -> str:
+    return load_prompt(WHISPER_MODEL_FILE, default)
+
+# Save the Whisper model name to the settings file
+def save_whisper_model_name(model_name: str):
+    save_prompt(WHISPER_MODEL_FILE, model_name)
 
 def get_settings_ui(supervisor_agent) -> HTMLResponse:
     # Render a simple HTML form for modifying the supervisor's and final output agent's settings
@@ -39,6 +48,7 @@ Tu trabajo es:
 Siempre responde en español y enfócate en ser útil y específico con tus recomendaciones.
 Asegúrate de incluir visualizaciones adecuadas (como mapas para ubicaciones o gráficos para datos financieros).
 """)
+    whisper_model_name = load_whisper_model_name()
     return HTMLResponse(f"""
     <html>
         <head>
@@ -51,19 +61,23 @@ Asegúrate de incluir visualizaciones adecuadas (como mapas para ubicaciones o g
                 <textarea id="prompt" name="prompt" rows="4" cols="50">{supervisor_prompt}</textarea><br><br>
                 <label for="final_output_prompt">Final Output Agent Prompt:</label><br>
                 <textarea id="final_output_prompt" name="final_output_prompt" rows="4" cols="50">{final_output_prompt}</textarea><br><br>
+                <label for="whisper_model">Whisper Model:</label><br>
+                <input id="whisper_model" name="whisper_model" type="text" value="{whisper_model_name}"><br><br>
                 <button type="submit">Save Settings</button>
             </form>
         </body>
     </html>
     """)
 
-async def update_settings(supervisor_agent, prompt: Form(...), final_output_prompt: Form(...)) -> JSONResponse:
+async def update_settings(supervisor_agent, prompt: Form(...), final_output_prompt: Form(...), whisper_model: Form(...)) -> JSONResponse:
     # Extract string values from Form objects
     prompt_value = prompt if isinstance(prompt, str) else str(prompt)
     final_output_prompt_value = final_output_prompt if isinstance(final_output_prompt, str) else str(final_output_prompt)
+    whisper_model_value = whisper_model if isinstance(whisper_model, str) else str(whisper_model)
     
     # Update the supervisor's and final output agent's prompts and save them to files
     supervisor_agent.main_assistant.instructions = prompt_value
     save_prompt(SUPERVISOR_PROMPT_FILE, prompt_value)
     save_prompt(FINAL_OUTPUT_PROMPT_FILE, final_output_prompt_value)
+    save_whisper_model_name(whisper_model_value)
     return JSONResponse(content={"message": "Settings updated successfully"})
