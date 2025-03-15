@@ -6,6 +6,7 @@ import { LoadingSpinner } from "./loadingSpinner";
 interface Message {
   text: string;
   sender: "user" | "bot";
+  html_data?: string; // New property for HTML content
 }
 
 export default function Chat() {
@@ -30,10 +31,13 @@ export default function Chat() {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
-  const handleSend = async () => {
-    if (!input.trim()) return;
+  const handleSend = async (type: "prompt" | "stop" = "prompt") => {
+    if (type === "prompt" && !input.trim()) return;
 
-    const userMessage: Message = { text: input, sender: "user" };
+    const userMessage: Message = {
+      text: type === "prompt" ? input : "Eso es todo",
+      sender: "user",
+    };
     setMessages((prev) => [...prev, userMessage]);
     setInput(""); // Clear input
     setLoading(true);
@@ -41,14 +45,14 @@ export default function Chat() {
     // Add a loading message from the bot
     setMessages((prev) => [...prev, { sender: "bot", text: "loading..." }]);
 
-    const type = "prompt";
     try {
       const output = await SendUserPrompt(type, user_id, input);
       const data = output?.data || "Error retrieving the data!";
+      const html_data = output?.html_data || ""; // Extract HTML data from server response
 
       setMessages((prev) => [
         ...prev.slice(0, -1), // Remove last "loading..." message
-        { text: data, sender: "bot" },
+        { text: data, sender: "bot", html_data }, // Include html_data in the message
       ]);
     } catch (error) {
       setMessages((prev) => [
@@ -61,8 +65,21 @@ export default function Chat() {
   };
 
   return (
-    <div className="h-screen w-screen flex justify-end items-center bg-gray-200 pr-4">
-      <div className="w-1/2 h-[calc(100%-15px)] bg-white border-4 border-gray-500 rounded-lg shadow-lg p-4 flex flex-col">
+    <div className="h-screen w-screen flex justify-center items-center bg-gray-200 px-2">
+      <div className="w-full max-w-lg h-[calc(100%-15px)] bg-white border-4 border-gray-500 rounded-lg shadow-lg p-4 flex flex-col">
+        {/* Avatar Header */}
+        <div className="flex items-center space-x-4 mb-4 border-b pb-2">
+          <img
+            src="/avatar.svg" // Ensure this path points to the correct location of the avatar image
+            alt="Antonia the AI"
+            className="w-12 h-12 rounded-full"
+          />
+          <div>
+            <h2 className="text-lg font-semibold">Antonia</h2>
+            <p className="text-sm text-gray-500">Online</p>
+          </div>
+        </div>
+
         {/* Messages Area */}
         <div className="flex-1 h-[350px] overflow-y-auto border border-gray-300 p-2 rounded-lg space-y-2">
           {messages.map((msg, index) => (
@@ -77,7 +94,13 @@ export default function Chat() {
                     : "bg-gray-300 border-gray-400"
                 }`}
               >
-                {msg.text === "loading..." ? <LoadingSpinner /> : msg.text}
+                {msg.text === "loading..." ? (
+                  <LoadingSpinner />
+                ) : msg.html_data ? (
+                  <div dangerouslySetInnerHTML={{ __html: msg.html_data || "" }}></div>
+                ) : (
+                  msg.text
+                )}
               </div>
             </div>
           ))}
@@ -86,7 +109,7 @@ export default function Chat() {
         </div>
 
         {/* Input Field & Send Button */}
-        <div className="flex mt-2">
+        <div className="flex flex-col sm:flex-row mt-2 space-y-2 sm:space-y-0 sm:space-x-2">
           <input
             className="flex-1 p-2 border-2 rounded-lg focus:outline-none"
             type="text"
@@ -96,16 +119,16 @@ export default function Chat() {
             placeholder="Escribe un mensaje..."
           />
           <button
-            className="hover:bg-sky-700 w-24 bg-blue-400 text-white text-lg rounded-lg ml-2 p-2"
-            onClick={handleSend}
+            className="hover:bg-sky-700 w-full sm:w-24 bg-blue-400 text-white text-lg rounded-lg p-2"
+            onClick={() => handleSend("prompt")}
           >
             Envia
           </button>
           <button
-            className="hover:bg-red-700 w-24 bg-red-400 text-white text-lg rounded-lg ml-2 p-2"
-            onClick={handleSend}
+            className="hover:bg-red-700 w-full sm:w-24 bg-red-400 text-white text-lg rounded-lg p-2"
+            onClick={() => handleSend("stop")}
           >
-            Finaliza
+            Eso es todo
           </button>
         </div>
       </div>
