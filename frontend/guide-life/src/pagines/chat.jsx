@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 
-
 export default function Chat() {
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState("");
@@ -13,9 +12,14 @@ export default function Chat() {
     setInput("");
   };
 
+  const enterPressed = () => {
+    console.log("ntro");  
+    handleSend()
+  }
+
   return (
-    <div className="h-screen w-screen flex justify-center items-center bg-gray-200">
-      <div className="w-[400px] h-[500px] bg-white border-4 border-red-500 rounded-lg shadow-lg p-4 flex flex-col">
+    <div className="h-screen w-screen flex justify-end items-center bg-gray-200 pr-4">
+      <div className="w-96 h-3/4 bg-white border-4 border-gray-500 rounded-lg shadow-lg p-4 flex flex-col">
         {/* Messages Area */}
         <div className="flex-1 h-[350px] overflow-y-auto border border-gray-300 p-2 rounded-lg">
           {messages.length > 0 ? (
@@ -42,11 +46,18 @@ export default function Chat() {
             className="flex-1 p-2 border-2 rounded-lg focus:outline-none"
             type="text"
             value={input}
-            onChange={(e) => setInput(e.target.value)}
+            onChange={(e) => {
+              setInput(e.target.value); 
+            }}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                enterPressed(input);
+              }
+            }}
             placeholder="Type a message..."
           />
           <button
-            className="w-24 bg-blue-600 text-red-950 text-lg font-bold rounded-lg ml-2 p-2"
+            className="hover:bg-sky-700 w-24 bg-blue-400 text-red-950 text-lg rounded-lg ml-2 p-2"
             onClick={handleSend}
           >
             Send
