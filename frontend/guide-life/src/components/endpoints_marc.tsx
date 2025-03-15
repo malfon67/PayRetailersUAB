@@ -1,6 +1,15 @@
 const prompt_url = "https://0578-158-109-94-92.ngrok-free.app/process-input";
 
-export default async function sendUserPrompt(promptType:string, userID:string, prompt:string) {
+interface PromptResponse {
+  data?: string; // Adjust type based on actual API response
+  error?: string;
+}
+
+export default async function sendUserPrompt(
+  promptType: string,
+  userID: string,
+  prompt: string
+): Promise<PromptResponse> {
   try {
     const response = await fetch(prompt_url, {
       method: "POST",
@@ -18,11 +27,11 @@ export default async function sendUserPrompt(promptType:string, userID:string, p
       throw new Error("Network response was not ok");
     }
 
-    const result = await response.json();
-    console.log("api response: " + result);
-    return result; // Return the data for further use
+    const result: PromptResponse = await response.json();
+    console.log("API Response:", result);
+    return result; // Return typed data
   } catch (error) {
     console.error("Error fetching data:", error);
-    throw error; // Allow handling the error where the function is called
+    return { error: (error as Error).message }; // Ensure consistent return type
   }
 }
