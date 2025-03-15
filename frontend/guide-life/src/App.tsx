@@ -1,13 +1,14 @@
 import React from 'react';
+import AppRoutes from './rutes/AppRoutes';
 import './App.css';
 import "tailwindcss";
-import "./components/test";
-import Test from './components/test';
+import "./pagines/test";
 
 function App() {
   return (
-      <Test />
+    <AppRoutes />
   );
 }
 
 export default App;
+
