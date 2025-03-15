@@ -6,12 +6,28 @@ import io
 from agent_manager import supervisor_agent, handle_conversation  # Import supervisor_agent and handle_conversation
 from settings import get_settings_ui, update_settings, load_whisper_model_name  # Import settings functions
 import random
-import uuid
-import whisper  # Import the Whisper library for speech-to-text
 
-from agents import RawResponsesStreamEvent
+from dotenv import load_dotenv
+import os
+
+load_dotenv()
+from groq import Groq
+
+
+USE_LOCAL_WHISPER_API = os.environ.get("USE_LOCAL_WHISPER_API", "false").lower() == "true"
+
+
+if USE_LOCAL_WHISPER_API:
+    import whisper  
+    
+
 from openai.types.responses import ResponseContentPartDoneEvent, ResponseTextDeltaEvent
 from html_templates import generate_html_from_json  # Import the HTML templates module
+import tempfile # Import the tempfile module for temporary file handling
+
+# Set up Groq client
+client = Groq(
+    api_key=os.getenv("GROQ_API_KEY"))
 
 app = FastAPI()
 
@@ -36,25 +52,58 @@ app.add_middleware(
     allow_headers=["*"],  # Allow all headers
 )
 
-# Load the Whisper model dynamically
-def load_whisper_model():
-    model_name = load_whisper_model_name()
-    return whisper.load_model(model_name)
+if USE_LOCAL_WHISPER_API:
+    # Load the Whisper model dynamically
+    def load_whisper_model():
+        model_name = load_whisper_model_name()
+        return whisper.load_model(model_name)
 
-whisper_model = load_whisper_model()
+    whisper_model = load_whisper_model()
 
-# Function to transcribe audio using Whisper
+# Function to transcribe audio using Groq's Whisper API
+def transcribe_audio_with_groq(audio_file_path: str) -> str:
+    """
+    Transcribe audio using Groq's Whisper implementation.
+    """
+    try:
+        with open(audio_file_path, "rb") as file:
+            transcription = client.audio.transcriptions.create(
+                file=(os.path.basename(audio_file_path), file.read()),
+                model="whisper-large-v3",
+                prompt="""Transcribe the audio to text. Always respond in Spanish.""",
+                response_format="text",
+                language="en",
+            )
+        return transcription  # This is now directly the transcription text
+    except Exception as e:
+        print(f"An error occurred with Groq transcription: {str(e)}")
+        return "Transcription failed with Groq."
+
+# Updated function to transcribe audio using the selected method
 def transcribe_audio(audio_file: io.BytesIO) -> str:
     """
-    Transcribes audio using the Whisper model.
+    Transcribes audio using either the local Whisper model or Groq's Whisper API based on configuration.
     """
-    audio_file.seek(0)  # Ensure the file pointer is at the beginning
-    audio_data = audio_file.read()
-    with open("temp_audio.wav", "wb") as temp_file:
-        temp_file.write(audio_data)
-    result = whisper_model.transcribe("temp_audio.wav")
-    print(result)
-    return result.get("text", "Transcription failed")
+    if USE_LOCAL_WHISPER_API:
+        print("Using local Whisper model for transcription.")
+        audio_file.seek(0)  # Ensure the file pointer is at the beginning
+        with tempfile.NamedTemporaryFile(suffix=".wav", delete=False) as temp_audio:
+            temp_audio.write(audio_file.read())
+            temp_audio_path = temp_audio.name
+        result = whisper_model.transcribe(temp_audio_path)
+        os.unlink(temp_audio_path)  # Clean up temporary file
+        print(result)
+        return result.get("text", "Transcription failed")
+    else:
+        print("Using Groq's Whisper API for transcription.")
+        # Save the input audio file temporarily
+        with tempfile.NamedTemporaryFile(suffix=".wav", delete=False) as temp_audio:
+            temp_audio.write(audio_file.read())
+            temp_audio_path = temp_audio.name
+        transcription = transcribe_audio_with_groq(temp_audio_path)
+        os.unlink(temp_audio_path)  # Clean up temporary file
+        return transcription
+        
 
 async def process(payload: dict) -> dict:
     """
