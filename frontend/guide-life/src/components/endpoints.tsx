@@ -8,7 +8,6 @@ export interface FormData {
     num_sons: number;
     civil_state: string;
     employment_status: string; // Afegit camp per a l'estat laboral
-
   }
   
   const generateRandomUserId = (): string => {
@@ -24,7 +23,13 @@ export interface FormData {
     return `${day}/${month}/${year}`;
   };
 
-  export const submitFormData = async (formData: FormData): Promise<any> => {
+  interface PromptResponse {
+    type?: string;
+    user_id?: string;
+    data?: string;
+  }
+
+  export const submitFormData = async (formData: FormData): Promise<PromptResponse> => {
     const requestBody = {
       type: "start",
       user_id: generateRandomUserId(), // Genera una user_id aleatòria
@@ -43,7 +48,7 @@ export interface FormData {
     };
   
     try {
-      const response = await fetch("https://b879-158-109-94-92.ngrok-free.app/process-input", {
+      const response = await fetch("https://e60b-158-109-94-92.ngrok-free.app/process-input", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

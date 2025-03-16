@@ -1,4 +1,4 @@
-const prompt_url = "https://b879-158-109-94-92.ngrok-free.app/process-input";
+const prompt_url = "https://e60b-158-109-94-92.ngrok-free.app/process-input";
 
 interface PromptResponse {
   data?: string; // Adjust type based on actual API response
@@ -31,6 +31,7 @@ export default async function sendUserPrompt(
     }
 
     const result: PromptResponse = await response.json();
+    console.log(`Respa: ${result}`);
     return result; // Return typed data
   } catch (error) {
     console.error("Error fetching data:", error);

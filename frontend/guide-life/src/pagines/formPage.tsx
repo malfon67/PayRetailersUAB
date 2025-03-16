@@ -6,11 +6,15 @@ const FormPage = () => {
   const navigate = useNavigate(); // Inicialitza useNavigate
 
   const handleFormSubmit = async (formData: FormData) => {
-    console.log('Form Data:', formData);
 
     try {
-      navigate("/chat"); // Redirigeix a la pàgina de confirmació
       const result = await submitFormData(formData);
+
+      const data = result?.data || "Soy Antonia, pregúntame lo que quiras";
+      const user_id = result?.user_id || "DEF-10";
+
+      navigate("/chat", { state: { responseAI: data, userID: user_id } });
+
       console.log('Resposta de l\'API:', result);
 
     } catch (error) {

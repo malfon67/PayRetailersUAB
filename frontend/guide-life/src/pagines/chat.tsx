@@ -5,6 +5,7 @@ import { useNavigate } from "react-router-dom";
 import AudioRecorder from "./audioRecorder";
 import sendUserAudio from "../components/userAudio_API";
 import { AudioSpinner } from "./audioSpinner";
+import { useLocation } from "react-router-dom";
 
 interface Message {
   text?: string;
@@ -20,16 +21,20 @@ export default function Chat() {
   const [goodPoints, setGoodPoints] = useState<string[]>([]);
   const [badPoints, setBadPoints] = useState<string[]>([]);
   const [recordingInfo, setRecordingInfo] = useState<boolean>(false);
+  const [htmlData, setHtmlData] = useState<string>("");
 
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
   const navigate = useNavigate();
-  const user_id = "xxx";
   const defaultMsg = "Dime algo que necesite saber sobre ti...";
+
+  const location = useLocation();
+  const responseForms = location.state?.responseAI || defaultMsg;
+  const responseID = location.state?.userID || defaultMsg;
 
   useEffect(() => {
     setMessages((prev) => {
       if (prev.length === 0) {
-        return [...prev, { text: defaultMsg, sender: "bot" }];
+        return [...prev, { text: responseForms, sender: "bot" }];
       }
       return prev;
     });
@@ -41,9 +46,11 @@ export default function Chat() {
 
   useEffect(() => {}, [goodPoints, badPoints]);
 
-  const stopQuestions = (): void => {
-    handleSend("stop");
-    navigate("/summary", { replace: true });
+  const stopQuestions = async () => {
+    console.log("stopped:");
+    await handleSend("stop");
+    console.log("data here: " + htmlData);
+    navigate("/summary", { state: { report: htmlData } });
   };
 
   const handleAudioRecorded = async (fileUrl: File, recording: boolean) => {
@@ -65,7 +72,7 @@ export default function Chat() {
         // Add "loading..." message from bot
         setMessages((prev) => [...prev, { sender: "bot", type: "loading" }]);
   
-        const out = await sendUserAudio("XXX", fileUrl);
+        const out = await sendUserAudio(responseID, fileUrl);
         const html_data: string = out?.html_data || "Error API";
         const data: string = out?.data || "";
         const goodPoints: string[] = out?.good_points || [];
@@ -100,7 +107,7 @@ export default function Chat() {
     if (type === "prompt" && !input.trim()) return;
 
     const userMessage: Message = {
-      text: type === "prompt" ? input : "Eso es todo",
+      text: type === "prompt" ? input : "Generando informe",
       sender: "user",
     };
     setMessages((prev) => [...prev, userMessage]);
@@ -110,11 +117,20 @@ export default function Chat() {
     setMessages((prev) => [...prev, { sender: "bot", type: "loading" }]);
 
     try {
-      const output = await SendUserPrompt("prompt", user_id, input);
-      const data: string = output?.data || "Error getting the data from AI";
+      let output = null;
+
+      if (type == "stop") {
+        output = await SendUserPrompt("stop", responseID, "");
+      } else {
+        output = await SendUserPrompt("prompt", responseID, input);
+      }
+
       const html_data = output?.html_data || "";
+      const data: string = output?.data || "Error getting the data from AI";
       const goodPoints: string[] = output?.good_points || [];
       const badPoints: string[] = output?.pain_points || [];
+
+      setHtmlData(html_data);
 
       setGoodPoints(goodPoints);
       setBadPoints(badPoints);
@@ -183,7 +199,8 @@ export default function Chat() {
           <button className="hover:bg-sky-700 w-full sm:w-24 bg-blue-400 text-white text-lg rounded-lg p-2" onClick={() => handleSend("prompt")}>
             Envia
           </button>
-          <button className="hover:bg-red-700 w-full sm:w-24 bg-red-400 text-white text-lg rounded-lg p-2" onClick={stopQuestions}>
+          <button className="hover:bg-red-700 w-full sm:w-24 bg-red-400 text-white text-lg rounded-lg p-2" 
+          onClick={stopQuestions}>
             Informe
           </button>
         </div>
