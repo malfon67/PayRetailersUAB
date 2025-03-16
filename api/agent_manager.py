@@ -167,20 +167,30 @@ async def handle_conversation(payload: dict) -> dict:
     if not user_id:
         return {"error": "User ID is required", "status_code": 400}
 
-    # Initialize conversation history and pain points for the user if not already present
+    global user_data
+    # Initialize conversation history, pain points, and user data for the user if not already present
     if user_id not in conversation_histories:
         conversation_histories[user_id] = []
     if user_id not in user_pain_points:
         user_pain_points[user_id] = []
     if user_id not in user_good_points:
         user_good_points[user_id] = []
+    if user_id not in user_data:
+        user_data[user_id] = {}  # Ensure user_data is initialized
+
+# # Load user data dynamically to ensure the latest state
+#     global user_data
+#     user_data = load_user_data()
+
 
     # Handle the start of the conversation
     if payload_type == "start":
         user_data_for_user = payload.get("user_data", {})  # Use a local variable to avoid shadowing the global dictionary
+        user_data[user_id].update(user_data_for_user)  # Update user data for future reference
+        save_user_data()  # Save updated user data to the file
         
         # Format the user data as JSON, but avoid potential policy triggers
-        formatted_user_data = json.dumps(user_data_for_user, indent=2, ensure_ascii=False)
+        formatted_user_data = json.dumps(user_data[user_id], indent=2, ensure_ascii=False)
         user_context = f"Información de usuario:\n```json\n{formatted_user_data}\n```\n"
         user_context += "Inicia una conversación amable en español con esta persona. "
         user_context += "Pregunta sobre cómo puedes ayudarle hoy. No utilices ningún agente especializado."
@@ -188,8 +198,6 @@ async def handle_conversation(payload: dict) -> dict:
 
         try:
             # Process the user context through the supervisor
-            # result = await supervisor_agent.process_input(user_context)
-
             result = client.chat.completions.create(
                 model=llm_model_name,
                 messages=[
@@ -236,10 +244,15 @@ async def handle_conversation(payload: dict) -> dict:
         if not prompt_text:
             return {"error": "Prompt text is required for type 'prompt'", "status_code": 400}
 
+        user_data = load_user_data()
+        print(user_data, user_id)
+        print (user_data.get(user_id, {}))
+
         # Retrieve user data for the user
-        user_data_for_user = user_data.get(user_id, {})
-        formatted_user_data = json.dumps(user_data_for_user, indent=2, ensure_ascii=False)
+        formatted_user_data = json.dumps(user_data.get(user_id, {}), indent=2, ensure_ascii=False)
         user_context = f"Información de usuario:\n```json\n{formatted_user_data}\n```\n"
+
+        print(f"User context: {user_context}")
 
         # Append user data to the prompt text
         prompt_text = user_context + prompt_text
@@ -264,12 +277,11 @@ async def handle_conversation(payload: dict) -> dict:
             # Process the user input through the supervisor agent
             html_output = await supervisor_agent.process_input(prompt_text)
 
-            # Extract the dynamically generated HTML from the agent's response
-            # html_output = result.final_output  # Assuming the agent returns HTML in final_output
-
             # Store conversation for future reference
             conversation_histories[user_id].append({"content": prompt_text, "role": "user"})
             conversation_histories[user_id].append({"content": html_output, "role": "assistant"})
+
+            save_user_data()  # Save updated user data to the file
 
             return {
                 "type": "response",
@@ -277,13 +289,9 @@ async def handle_conversation(payload: dict) -> dict:
                 "data": html_output,  # Return the HTML output directly
                 "pain_points": user_pain_points[user_id],
                 "good_points": user_good_points[user_id],
-                # "last_agent": result.last_agent.name
             } 
         except Exception as e:
             print(f"Error processing prompt: {str(e)}")
-            print(f"User ID: {user_id}")
-            print(f"Prompt text: {prompt_text}")
-            print(f"Conversation history: {conversation_histories.get(user_id, [])}")
             # Provide a safe fallback response
             fallback_response = "Entiendo. ¿Hay algo más en lo que pueda ayudarte?"
             conversation_histories[user_id].append({"content": prompt_text, "role": "user"})
@@ -295,7 +303,6 @@ async def handle_conversation(payload: dict) -> dict:
                 "data": BaseAgentOutput(agent_type="html", status="success", data=fallback_response),
                 "pain_points": user_pain_points[user_id],
                 "good_points": user_good_points[user_id],
-                "last_agent": supervisor_agent.main_assistant.name
             }
 
     # Handle the end of the conversation
@@ -308,8 +315,14 @@ async def handle_conversation(payload: dict) -> dict:
             role = entry.get("role", "system")
             content = entry.get("content", "")
             conversation_text += f"{role.capitalize()}: {content}\n\n"
+
+        print(conversation_text)
         
         try:
+            user_data = load_user_data()
+            print(user_data, user_id)
+            print (user_data.get(user_id, {}))
+            
             # Ensure user_data is initialized for the user
             user_data_for_user = user_data.get(user_id, {})
 
@@ -380,3 +393,27 @@ async def handle_conversation(payload: dict) -> dict:
     # Handle invalid types
     else:
         return {"error": "Invalid type in payload", "status_code": 400}
+
+# Define the path for the user data JSON file
+USER_DATA_FILE = os.path.join(os.path.dirname(__file__), "user_data.json")
+
+def load_user_data():
+    """
+    Load user data from the JSON file. If the file does not exist or is invalid, return an empty dictionary.
+    """
+    if os.path.exists(USER_DATA_FILE):
+        try:
+            with open(USER_DATA_FILE, "r", encoding="utf-8") as file:
+                return json.load(file)
+        except json.JSONDecodeError:
+            print("Error decoding user data JSON file. Starting with an empty dictionary.")
+
+def save_user_data():
+    """
+    Save the current user data to the JSON file.
+    """
+    try:
+        with open(USER_DATA_FILE, "w", encoding="utf-8") as file:
+            json.dump(user_data, file, indent=2, ensure_ascii=False)
+    except Exception as e:
+        print(f"Error saving user data to file: {e}")

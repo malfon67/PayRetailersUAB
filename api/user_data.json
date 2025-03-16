@@ -1,0 +1,14 @@
+{
+  "user_9476": {
+    "name": "Alex Rocas Fusta",
+    "age": 0,
+    "birthday": "10/03/2025",
+    "country": "Colombia",
+    "city": "Medellín",
+    "sex": "Male",
+    "has_sons": true,
+    "num_sons": 1,
+    "civil_state": "Soltero",
+    "employment_status": "Estudiando Informática"
+  }
+}
