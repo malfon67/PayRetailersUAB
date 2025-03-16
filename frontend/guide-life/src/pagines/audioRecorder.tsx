@@ -1,61 +1,66 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 
 interface AudioRecorderProps {
-  onAudioRecorded: (fileUrl: File) => void; // Function to send back the audio URL
+  onAudioRecorded: (fileUrl: File, recording: boolean) => void; 
 }
 
 const AudioRecorder: React.FC<AudioRecorderProps> = ({ onAudioRecorded }) => {
   const [recording, setRecording] = useState(false);
   const mediaRecorder = useRef<MediaRecorder | null>(null);
   const audioChunks = useRef<Blob[]>([]);
+  const [loading, setLoading] = useState<boolean>(false);
+
+  useEffect(() => {
+    if (recording) {
+      startRecording();
+    } else if (mediaRecorder.current) {
+      stopRecording();
+    }
+  }, [recording]);
 
   const startRecording = async () => {
-    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-    mediaRecorder.current = new MediaRecorder(stream);
-    audioChunks.current = [];
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      mediaRecorder.current = new MediaRecorder(stream);
+      audioChunks.current = [];
 
-    mediaRecorder.current.ondataavailable = (event) => {
-      if (event.data.size > 0) audioChunks.current.push(event.data);
-    };
+      mediaRecorder.current.ondataavailable = (event) => {
+        if (event.data.size > 0) {
+          audioChunks.current.push(event.data);
+        }
+      };
 
-    mediaRecorder.current.onstop = async () => {
-      const audioBlob = new Blob(audioChunks.current, { type: "audio/webm" });
+      mediaRecorder.current.onstop = async () => {
+        const audioBlob = new Blob(audioChunks.current, { type: "audio/webm" });
+        const file = new File([audioBlob], "recording.webm");
 
-      // Generate a URL
-      const fileUrl = URL.createObjectURL(audioBlob);
-      var file = new File([audioBlob], "name");
+        // Send recorded audio to parent
+        onAudioRecorded(file, false); // Notify stop
+      };
 
-      console.log("Local Blob URL:", fileUrl);
-
-      // Send the URL to parent component
-      onAudioRecorded(file);
-    };
-
-    mediaRecorder.current.start();
-    setRecording(true);
+      mediaRecorder.current.start();
+      onAudioRecorded(new File([], ""), true); // Notify start
+    } catch (error) {
+      console.error("Error accessing microphone:", error);
+      setRecording(false);
+    }
   };
 
   const stopRecording = () => {
-    mediaRecorder.current?.stop();
+    if (mediaRecorder.current) {
+      mediaRecorder.current.stop();
+    }
     setRecording(false);
   };
 
-  const sendAudioFile = (file: Blob) => {
-    const formData = new FormData();
-    formData.append('audio-file', file);
-    return fetch('http://localhost:3000/audioUpload', {
-      method: 'POST',
-      body: formData
-    });
-  };
-
   return (
-    <div>
+    <div className="flex flex-row items-center">
       <button
-        className={`w-24 text-white text-lg rounded-lg ml-2 p-2 ${
+        className={`text-white text-lg rounded-lg ml-2 p-2 ${
           recording ? "bg-red-600 hover:bg-red-800" : "bg-gray-600 hover:bg-gray-800"
         }`}
-        onClick={recording ? stopRecording : startRecording}
+        onClick={() => setRecording((prev) => !prev)}
+        title="Graba una nota de voz"
       >
         {recording ? "REC..." : "🎙️"}
       </button>

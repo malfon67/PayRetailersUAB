@@ -1,0 +1,6 @@
+{
+  "dependencies": {
+    "react-audio-voice-recorder": "^2.2.0",
+    "spinners-react": "^1.0.10"
+  }
+}

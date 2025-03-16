@@ -1,11 +1,13 @@
 const prompt_url = "https://f7ae-158-109-94-92.ngrok-free.app/audio-input";
 
 interface PromptResponse {
-  user_id?: string; // Adjust type based on actual API response
+  user_id?: string;
   data?: string;
-  goodPoints?: Array<string>;
-  badPoints?: Array<string>;
+  html_data?: string;
+  good_points?: Array<string>;
+  pain_points?: Array<string>;
 }
+
 
 export default async function sendUserAudio(
   userID: string,
@@ -26,7 +28,6 @@ export default async function sendUserAudio(
     }
 
     const result: PromptResponse = await response.json();
-    console.log("Audio Response:", result);
     return result;
   } catch (error) {
     console.error("Error fetching data:", error);

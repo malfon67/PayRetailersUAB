@@ -3,8 +3,9 @@ const prompt_url = "https://f7ae-158-109-94-92.ngrok-free.app/process-input";
 interface PromptResponse {
   data?: string; // Adjust type based on actual API response
   error?: string;
-  goodPoints?: Array<string>;
-  badPoints?: Array<string>;
+  html_data?: string;
+  good_points?: Array<string>;
+  pain_points?: Array<string>;
 }
 
 export default async function sendUserPrompt(
@@ -30,7 +31,6 @@ export default async function sendUserPrompt(
     }
 
     const result: PromptResponse = await response.json();
-    console.log("API Response:", result);
     return result; // Return typed data
   } catch (error) {
     console.error("Error fetching data:", error);
