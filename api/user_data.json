@@ -1,0 +1,74 @@
+{
+  "user_9476": {
+    "name": "Alex Rocas Fusta",
+    "age": 0,
+    "birthday": "10/03/2025",
+    "country": "Colombia",
+    "city": "Medellín",
+    "sex": "Male",
+    "has_sons": true,
+    "num_sons": 1,
+    "civil_state": "Soltero",
+    "employment_status": "Estudiando Informática"
+  },
+  "user_2807": {
+    "name": "Bruno Moya Ruiz",
+    "age": 24,
+    "birthday": "21/08/2001",
+    "country": "Colombia",
+    "city": "Bogotá",
+    "sex": "Male",
+    "has_sons": false,
+    "num_sons": 1,
+    "civil_state": "Soltero",
+    "employment_status": "Emprendiendo"
+  },
+  "user_2824": {
+    "name": "Bruno Moya Ruiz",
+    "age": 24,
+    "birthday": "21/08/2001",
+    "country": "Colombia",
+    "city": "Bogotá",
+    "sex": "Male",
+    "has_sons": false,
+    "num_sons": 1,
+    "civil_state": "Soltero",
+    "employment_status": "Emprendiendo"
+  },
+  "user_2692": {
+    "name": "Bruno Moya Ruiz",
+    "age": 24,
+    "birthday": "21/08/2001",
+    "country": "Colombia",
+    "city": "Bucaramanga",
+    "sex": "Male",
+    "has_sons": false,
+    "num_sons": 1,
+    "civil_state": "Soltero",
+    "employment_status": "Emprendiendo"
+  },
+  "user_3965": {
+    "name": "Bruno Moya Ruiz",
+    "age": 24,
+    "birthday": "21/08/2001",
+    "country": "Curaçao",
+    "city": "Sabana Westpunt",
+    "sex": "Male",
+    "has_sons": false,
+    "num_sons": 1,
+    "civil_state": "Soltero",
+    "employment_status": "Emprendiendo en Glassear"
+  },
+  "user_6294": {
+    "name": "Bruno Moya",
+    "age": 24,
+    "birthday": "21/08/2001",
+    "country": "Grenada",
+    "city": "Grenville",
+    "sex": "Male",
+    "has_sons": false,
+    "num_sons": 1,
+    "civil_state": "Soltero",
+    "employment_status": "emprendiendo"
+  }
+}

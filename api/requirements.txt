@@ -1,0 +1,11 @@
+fastapi==0.110.0
+uvicorn==0.30.0
+python-multipart==0.0.9
+requests==2.31.0
+python-dotenv==1.0.1
+# azure-openai==1.2.0
+openai==1.66.2
+pydantic==2.10.6
+typing_extensions==4.12.2
+openai-agents==0.0.4
+groq
