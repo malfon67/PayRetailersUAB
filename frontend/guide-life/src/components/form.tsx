@@ -46,7 +46,7 @@ const Form: React.FC<FormProps> = ({ onSubmit }) => {
     city: "",
     sex: "Default", // Estado inicial: "Selecciona tu sexo"
     has_sons: false,
-    num_sons: 0,
+    num_sons: 1,
     civil_state: "",
     employment_status: "", // Estat laboral inicial buit
   });

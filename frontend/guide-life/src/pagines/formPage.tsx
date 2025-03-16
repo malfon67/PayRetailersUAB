@@ -9,9 +9,9 @@ const FormPage = () => {
     console.log('Form Data:', formData);
 
     try {
+      navigate("/chat"); // Redirigeix a la pàgina de confirmació
       const result = await submitFormData(formData);
       console.log('Resposta de l\'API:', result);
-      navigate("/chat"); // Redirigeix a la pàgina de confirmació
 
     } catch (error) {
       console.error('Error:', error);

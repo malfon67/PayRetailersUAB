@@ -126,7 +126,7 @@ export default function Chat() {
 
   return (
     <div className="h-screen w-screen flex justify-center items-center bg-gray-200 px-2">
-      <div className="w-full max-w-lg h-[calc(100%-15px)] bg-white border-4 border-gray-500 rounded-lg shadow-lg p-4 flex flex-col">
+      <div className="w-1/2 h-[calc(100%-15px)] bg-white border-4 border-gray-500 rounded-lg shadow-lg p-4 flex flex-col">
         {/* Avatar Header */}
         <div className="flex items-center space-x-4 mb-4 border-b pb-2">
           <img src="/avatar.svg" alt="Antonia the AI" className="w-12 h-12 rounded-full" />
