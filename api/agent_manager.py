@@ -208,7 +208,7 @@ async def handle_conversation(payload: dict) -> dict:
             return {
                 "type": "response",
                 "user_id": user_id,
-                "data": output,
+                "data": BaseAgentOutput(agent_type="html", status="success", data=output),
                 "pain_points": [],  # No pain points extracted at this stage
                 "good_points": [],  # No good points extracted at this stage
                 "last_agent": None  # No specialized agent used at this stage
