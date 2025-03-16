@@ -105,7 +105,7 @@ def transcribe_audio(audio_file: io.BytesIO) -> str:
         return transcription
         
 
-async def process(payload: dict) -> dict:
+async def process(payload: dict, transcribed_text: str = None):
     """
     Process the conversation based on the provided payload.
     """
@@ -131,6 +131,7 @@ async def process(payload: dict) -> dict:
         "html_data": html_output,
         "pain_points": response.get("pain_points"),
         "good_points": response.get("good_points"),
+        "transcribed_text": transcribed_text if transcribed_text else None
     }
  
 @app.post("/process-input/")
@@ -159,7 +160,7 @@ async def audio_input(file: UploadFile = File(...), user_id: str = Form(...)):
         "data": transcribed_text
     }
 
-    return await process(payload)
+    return await process(payload, transcribed_text)
 
 @app.get("/settings/", response_class=HTMLResponse)
 async def settings_ui():

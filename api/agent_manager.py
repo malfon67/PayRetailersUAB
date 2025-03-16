@@ -172,7 +172,8 @@ async def handle_conversation(payload: dict) -> dict:
         formatted_user_data = json.dumps(user_data, indent=2, ensure_ascii=False)
         user_context = f"Información de usuario:\n```json\n{formatted_user_data}\n```\n"
         user_context += "Inicia una conversación amable en español con esta persona. "
-        user_context += "Pregunta sobre cómo puedes ayudarle hoy."
+        user_context += "Pregunta sobre cómo puedes ayudarle hoy. No utilizes ningún agente."
+        user_context += "Simplemente comienza la conversación y deja que el sistema maneje el resto."
         
         try:
             # Process the user context through the supervisor
@@ -182,14 +183,30 @@ async def handle_conversation(payload: dict) -> dict:
             conversation_histories[user_id].append({"content": user_context, "role": "user"})
             conversation_histories[user_id].append({"content": result.final_output, "role": "assistant"})
             
-            return {"type": "response", "data": result.final_output}
+            return {
+                "type": "response",
+                "user_id": user_id,
+                "data": result.final_output,
+                "pain_points": [],
+                "good_points": [],
+                "last_agent": result.last_agent.name
+            } 
         except Exception as e:
             print(f"Error processing initial conversation: {str(e)}")
             # Provide a safe fallback response
             fallback_response = "Hola, ¿en qué puedo ayudarte hoy?"
+            
             conversation_histories[user_id].append({"content": user_context, "role": "user"})
             conversation_histories[user_id].append({"content": fallback_response, "role": "assistant"})
-            return {"type": "response", "data": fallback_response}
+            
+            return {
+                "type": "response",
+                "user_id": user_id,
+                "data": fallback_response,
+                "pain_points": [],
+                "good_points": [],
+                "last_agent": supervisor_agent.main_assistant.name
+            } 
 
     # Handle sequential prompts
     elif payload_type == "prompt":
@@ -243,9 +260,11 @@ async def handle_conversation(payload: dict) -> dict:
             
             return {
                 "type": "response",
+                "user_id": user_id,
                 "data": fallback_response,
                 "pain_points": user_pain_points[user_id],
-                "good_points": user_good_points[user_id]
+                "good_points": user_good_points[user_id],
+                "last_agent": supervisor_agent.main_assistant.name
             }
 
     # Handle the end of the conversation

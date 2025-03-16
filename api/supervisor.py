@@ -7,7 +7,7 @@ class MainAgentOutput(BaseAgentOutput):
     """
     Output model for the Main Assistant.
     """
-    additional_info: Optional[str] = None  # Add any specific fields for the main agent if needed
+    # additional_info: Optional[str] = None  # Add any specific fields for the main agent if needed
 
 class Supervisor:
     def __init__(self, agents: List[Agent], model: OpenAIChatCompletionsModel, prompt: str):

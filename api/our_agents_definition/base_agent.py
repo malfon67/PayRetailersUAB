@@ -15,4 +15,5 @@ Tu salida debe estar en formato HTML y utilizar clases de Tailwind CSS para que 
 Asegúrate de que el diseño sea claro, accesible y visualmente atractivo. Genera contenido relevante y útil para el usuario, conciso no muy largo.
 Sobretodo, utiliza CSS para darle estilo a tu salida y hacerla atractiva.
 Utiliza tailwind por ejemplo para las negritas, itálicas, tamaños de letra, colores, etc.
+UTILIZA SIEMPRE TAILWIND CSS PARA TODO. 
 """
