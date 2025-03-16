@@ -12,7 +12,7 @@ const AppRoutes = () => {
         <Route path="/form" element={<FormPage />} />
         <Route path="/chat" element={<Chat />} />
         <Route path="/summary" element={<Summary />} />
-        <Route path="*" element={<Navigate to="/chat" replace />} />
+        <Route path="*" element={<Navigate to="/form" replace />} />
       </Routes>
     </Router>
   );
