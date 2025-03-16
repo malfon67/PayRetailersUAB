@@ -236,6 +236,14 @@ async def handle_conversation(payload: dict) -> dict:
         if not prompt_text:
             return {"error": "Prompt text is required for type 'prompt'", "status_code": 400}
 
+        # Retrieve user data for the user
+        user_data_for_user = user_data.get(user_id, {})
+        formatted_user_data = json.dumps(user_data_for_user, indent=2, ensure_ascii=False)
+        user_context = f"Información de usuario:\n```json\n{formatted_user_data}\n```\n"
+
+        # Append user data to the prompt text
+        prompt_text = user_context + prompt_text
+
         try:
             # Extract pain points using the new function
             points = await extract_points_from_response(prompt_text)

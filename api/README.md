@@ -8,6 +8,8 @@ PayRetailersUAB is a modular and extensible platform designed to provide intelli
 
 The platform is built using Python and FastAPI, with integrations for OpenAI, Groq, and other APIs to enable advanced functionalities like natural language processing, data retrieval, and HTML generation.
 
+![Example Self-Generated Output](docs/example_self_generate.png)
+
 ## Features
 
 - **Modular Agent System**: Specialized agents for different domains (e.g., health, finance, climate).
@@ -70,16 +72,28 @@ USE_LOCAL_WHISPER_API=true  # Set to false to use Groq's Whisper API
    http://localhost:8000/docs
    ```
 
-### Key Components
+## Key Components
 
 #### Agents
+
+Thanks to the modular design, agents can be easily added or removed to suit different use cases. The current agents include:
 
 - **Health Agent**: Provides health-related assistance using WHO data and web searches.
 - **Money Agent**: Offers financial advice and retrieves data from World Bank and ECLAC.
 - **Climate Agent**: Fetches climate data and environmental risks.
 - **Energy Agent**: Provides renewable energy data and sustainability tips.
 - **Government Agent**: Assists with government-related queries.
+- **Emigration Agent**: Helps with emigration-related queries.
 - **Final Output Agent**: Generates a final summary of conversations in HTML format.
+
+
+The following diagram illustrates the architecture of the agents and their interactions:
+
+![Platform Architecture](docs/diagram.png)
+
+We can create new agents under our_agents folder and they will be automatically loaded, and in hands of the supervisor.
+
+There's a special agent called `FinalOutputAgent` that generates the final HTML output based on the conversation history. This agent is responsible for summarizing the conversation and generating the final output.
 
 #### Supervisor
 
@@ -87,11 +101,11 @@ The `Supervisor` class manages the routing of user inputs to the appropriate age
 
 #### Transformers
 
-- **HTMLTransformer**: Converts agent outputs into responsive HTML using Tailwind CSS.
+- **HTMLTransformer**: Converts agent outputs into responsive HTML using Tailwind CSS. It uses GROQ for speed, and allows LLM to auto generate our UI and components based on the output.
 
 #### Utilities
 
-- **Perplexity API**: Enables web searches for various agents.
+- **Perplexity API**: Enables web searches for various agents like Health and Money.
 - **Whisper Integration**: Supports audio transcription using local or Groq's Whisper API.
 
 ### Customization
