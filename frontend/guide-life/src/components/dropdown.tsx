@@ -135,8 +135,8 @@ const Dropdown: React.FC<DropdownProps> = ({ id, label, value, onChange, type, s
   }, []);
 
   return (
-    <div className="mb-4 relative" ref={dropdownRef}>
-      <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor={id}>
+    <div className="mb-6 relative" ref={dropdownRef}>
+      <label className="block text-gray-700 text-lg font-semibold mb-2" htmlFor={id}>
         {label}
       </label>
       <input
@@ -146,15 +146,15 @@ const Dropdown: React.FC<DropdownProps> = ({ id, label, value, onChange, type, s
         onChange={handleInputChange}
         onFocus={handleInputFocus} // Open the dropdown when the input gains focus
         placeholder={`Escribe o selecciona ${label.toLowerCase()}`}
-        className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+        className="shadow appearance-none border rounded w-full py-3 px-4 text-gray-700 text-lg leading-tight focus:outline-none focus:ring-2 focus:ring-blue-500"
       />
       {isDropdownOpen && filteredOptions.length > 0 && (
-        <ul className="absolute z-10 bg-white border border-gray-300 rounded w-full mt-1 max-h-40 overflow-y-auto">
+        <ul className="absolute z-10 bg-white border border-gray-300 rounded w-full mt-1 max-h-40 overflow-y-auto shadow-lg">
           {filteredOptions.map((option, index) => (
             <li
               key={index}
               onClick={() => handleOptionClick(option)}
-              className="px-4 py-2 cursor-pointer hover:bg-gray-100"
+              className="px-4 py-2 text-lg cursor-pointer hover:bg-blue-100 transition duration-200"
             >
               {option}
             </li>

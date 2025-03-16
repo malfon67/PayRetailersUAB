@@ -14,7 +14,7 @@ export interface FormData {
   has_sons: boolean;
   num_sons: number;
   civil_state: string;
-  employment_status: string; // Nou camp per a l'estat laboral
+  employment_status: string;
 }
 
 // Mapeo de estado civil según el género
@@ -106,61 +106,60 @@ const Form: React.FC<FormProps> = ({ onSubmit }) => {
 
   return (
     <form
-      className="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4 w-full max-w-md"
+      className="bg-white shadow-lg rounded-lg px-10 py-8 mb-6 w-full max-w-lg mx-auto"
       onSubmit={handleSubmit}
     >
-      <h2 className="text-2xl font-bold mb-6 text-gray-800 text-center">Formulario de Usuario</h2>
+      <h2 className="text-4xl font-bold mb-8 text-gray-800 text-center">Guide-Life</h2>
 
-      {/* Nombre y Apellido */}
-      <div className="mb-4">
-        <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="username">
-          Nombre y Apellido
-        </label>
-        <input
-          className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-          id="username"
-          type="text"
-          placeholder="Introduce tu nombre y apellido"
-          value={formData.username}
-          onChange={(e) => handleChange(e.target.id, e.target.value)}
-        />
-        {errors.username && <p className="text-red-500 text-xs italic">{errors.username}</p>}
-      </div>
+    {/* Nombre y Apellido */}
+    <div className="mb-6">
+      <label className="block text-gray-700 text-lg font-semibold mb-2" htmlFor="username">
+        Nombre y Apellido
+      </label>
+      <input
+        className="shadow appearance-none border rounded w-full py-3 px-4 text-gray-700 text-lg leading-tight focus:outline-none focus:ring-2 focus:ring-blue-500"
+        id="username"
+        type="text"
+        placeholder="Introduce tu nombre y apellido"
+        value={formData.username}
+        onChange={(e) => handleChange(e.target.id, e.target.value)}
+      />
+      {errors.username && <p className="text-red-500 text-sm italic mt-1">{errors.username}</p>}
+    </div>
 
-      {/* Fecha de Nacimiento */}
-      <div className="mb-4">
-        <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="birthday">
-          Fecha de Nacimiento
-        </label>
-        <input
-          className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-          id="birthday"
-          type="date"
-          value={formData.birthday}
-          onChange={(e) => handleChange(e.target.id, e.target.value)}
-        />
-        {errors.birthday && <p className="text-red-500 text-xs italic">{errors.birthday}</p>}
-      </div>
+    {/* Fecha de Nacimiento */}
+    <div className="mb-6">
+      <label className="block text-gray-700 text-lg font-semibold mb-2" htmlFor="birthday">
+        Fecha de Nacimiento
+      </label>
+      <input
+        className="shadow appearance-none border rounded w-full py-3 px-4 text-gray-700 text-lg leading-tight focus:outline-none focus:ring-2 focus:ring-blue-500"
+        id="birthday"
+        type="date"
+        value={formData.birthday}
+        onChange={(e) => handleChange(e.target.id, e.target.value)}
+      />
+      {errors.birthday && <p className="text-red-500 text-sm italic mt-1">{errors.birthday}</p>}
+    </div>
 
-      {/* Estado Laboral */}
-      <div className="mb-4">
-        <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="employment_status">
-          Estado Laboral
-        </label>
-        <input
-          className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-          id="employment_status"
-          type="text"
-          placeholder="Introduce tu estado laboral"
-          value={formData.employment_status}
-          onChange={(e) => handleChange(e.target.id, e.target.value)}
-        />
-        {errors.employment_status && (
-          <p className="text-red-500 text-xs italic">{errors.employment_status}</p>
-        )}
-      </div>
-
-      {/* Dropdown per a Països */}
+    {/* Estado Laboral */}
+    <div className="mb-6">
+      <label className="block text-gray-700 text-lg font-semibold mb-2" htmlFor="employment_status">
+        Estado Laboral
+      </label>
+      <input
+        className="shadow appearance-none border rounded w-full py-3 px-4 text-gray-700 text-lg leading-tight focus:outline-none focus:ring-2 focus:ring-blue-500"
+        id="employment_status"
+        type="text"
+        placeholder="Introduce tu estado laboral"
+        value={formData.employment_status}
+        onChange={(e) => handleChange(e.target.id, e.target.value)}
+      />
+      {errors.employment_status && (
+        <p className="text-red-500 text-sm italic mt-1">{errors.employment_status}</p>
+      )}
+    </div>
+    {/* Dropdown per a Països */}
       <Dropdown
         id="country"
         label="País"
@@ -168,7 +167,7 @@ const Form: React.FC<FormProps> = ({ onSubmit }) => {
         onChange={(id, value) => handleChange(id, value)}
         type="country"
       />
-      {errors.country && <p className="text-red-500 text-xs italic">{errors.country}</p>}
+      {errors.country && <p className="text-red-500 text-xs italic mt-1">{errors.country}</p>}
 
       {/* Dropdown per a Ciutats */}
       <Dropdown
@@ -179,81 +178,79 @@ const Form: React.FC<FormProps> = ({ onSubmit }) => {
         type="city"
         selectedCountry={formData.country} // Nom del país seleccionat
       />
-      {errors.city && <p className="text-red-500 text-xs italic">{errors.city}</p>}
 
-      {/* Sexo */}
-      <div className="mb-4">
-        <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="sex">
-          Sexo
-        </label>
-        <select
-          className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-          id="sex"
-          value={formData.sex}
-          onChange={(e) => handleChange(e.target.id, e.target.value)}
-        >
-          <option value="Default">Selecciona tu sexo</option>
-          <option value="Male">Masculino</option>
-          <option value="Female">Femenino</option>
-        </select>
-        {errors.sex && <p className="text-red-500 text-xs italic">{errors.sex}</p>}
-      </div>
+    {/* Sexo */}
+    <div className="mb-6">
+      <label className="block text-gray-700 text-lg font-semibold mb-2" htmlFor="sex">
+        Sexo
+      </label>
+      <select
+        className="shadow appearance-none border rounded w-full py-3 px-4 text-gray-700 text-lg leading-tight focus:outline-none focus:ring-2 focus:ring-blue-500"
+        id="sex"
+        value={formData.sex}
+        onChange={(e) => handleChange(e.target.id, e.target.value)}
+      >
+        <option value="Default">Selecciona tu sexo</option>
+        <option value="Male">Masculino</option>
+        <option value="Female">Femenino</option>
+      </select>
+      {errors.sex && <p className="text-red-500 text-sm italic mt-1">{errors.sex}</p>}
+    </div>
 
-      {/* Estado Civil */}
-      <div className="mb-4">
-        <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="civil_state">
-          Estado Civil
-        </label>
-        <select
-          className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-          id="civil_state"
-          value={formData.civil_state}
-          onChange={(e) => handleChange(e.target.id, e.target.value)}
-        >
-          <option value="">Selecciona tu estado civil</option>
-          {civilStateMapping[formData.sex]?.map((state) => (
-            <option key={state} value={state}>
-              {state}
-            </option>
-          ))}
-        </select>
-        {errors.civil_state && <p className="text-red-500 text-xs italic">{errors.civil_state}</p>}
-      </div>
-
-      {/* ¿Tienes Hijos? */}
-      <div className="mb-4">
-        <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="has_sons">
-          ¿Tienes hijos?
+    {/* Estado Civil */}
+    <div className="mb-6">
+      <label className="block text-gray-700 text-lg font-semibold mb-2" htmlFor="civil_state">
+        Estado Civil
+      </label>
+      <select
+        className="shadow appearance-none border rounded w-full py-3 px-4 text-gray-700 text-lg leading-tight focus:outline-none focus:ring-2 focus:ring-blue-500"
+        id="civil_state"
+        value={formData.civil_state}
+        onChange={(e) => handleChange(e.target.id, e.target.value)}
+      >
+        <option value="">Selecciona tu estado civil</option>
+        {civilStateMapping[formData.sex]?.map((state) => (
+          <option key={state} value={state}>
+            {state}
+          </option>
+        ))}
+      </select>
+      {errors.civil_state && <p className="text-red-500 text-sm italic mt-1">{errors.civil_state}</p>}
+    </div>
+    {/* ¿Tienes Hijos? */}
+    <div className="mb-6">
+      <label className="block text-gray-700 text-lg font-semibold mb-2" htmlFor="has_sons">
+        ¿Tienes hijos?
+      </label>
+      <input
+        id="has_sons"
+        type="checkbox"
+        checked={formData.has_sons}
+        onChange={(e) => handleChange(e.target.id, e.target.checked)}
+        className="ml-6 w-6 h-6 text-blue-500 border-gray-300 rounded"
+      />
+    </div>
+    {/* Número de Hijos */}
+    {formData.has_sons && (
+      <div className="mb-6">
+        <label className="block text-gray-700 text-lg font-semibold mb-2" htmlFor="num_sons">
+          Número de Hijos
         </label>
         <input
-          id="has_sons"
-          type="checkbox"
-          checked={formData.has_sons}
-          onChange={(e) => handleChange(e.target.id, e.target.checked)}
+          className="shadow appearance-none border rounded w-full py-3 px-4 text-gray-700 text-lg leading-tight focus:outline-none focus:ring-2 focus:ring-blue-500"
+          id="num_sons"
+          type="number"
+          placeholder="Introduce el número de hijos"
+          value={formData.num_sons}
+          onChange={(e) => handleChange(e.target.id, e.target.value)}
         />
       </div>
-
-      {/* Número de Hijos */}
-      {formData.has_sons && (
-        <div className="mb-4">
-          <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="num_sons">
-            Número de Hijos
-          </label>
-          <input
-            className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-            id="num_sons"
-            type="number"
-            placeholder="Introduce el número de hijos"
-            value={formData.num_sons}
-            onChange={(e) => handleChange(e.target.id, e.target.value)}
-          />
-        </div>
-      )}
+    )}
 
       {/* Botón de Enviar */}
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-center">
         <button
-          className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+          className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-3 px-6 rounded-lg text-lg focus:outline-none focus:ring-2 focus:ring-blue-400 transition duration-300"
           type="submit"
         >
           Enviar
