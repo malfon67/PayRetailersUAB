@@ -20,7 +20,7 @@ For more details, visit the [Backend README](api/README.md).
 ### 2. Frontend
 The frontend is responsible for the user interface and interaction. It connects to the backend to display data and manage user inputs.
 
-For more details, visit the [Frontend README](frontend/README.md).
+For more details, visit the [Frontend README](frontend/guide-life/README.md).
 
 ## Features
 
