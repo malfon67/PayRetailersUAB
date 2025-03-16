@@ -93,11 +93,14 @@ payment_agent = Agent(
     name="Payment Agent",
     instructions=(
         BASE_STARTING_PROMPT +
-        "Ayuda a los usuarios a realizar pagos utilizando PayRetailers. Genera tu salida en formato JSON, y esta será transformada a HTML por el HTMLTransformer. "
-        "Responde solo en español."
+        "Este agente está afiliado a PayRetailers y está diseñado para ayudar a los usuarios a realizar pagos en línea de manera segura y eficiente en plataformas de comercio electrónico. "
+        "Proporciona asistencia con problemas relacionados con pagos, como errores en transacciones, métodos de pago disponibles, "
+        "seguimiento del estado de los pagos y cualquier consulta relacionada con el uso de PayRetailers. "
+        "Genera tu salida en formato JSON, y esta será transformada a HTML por el HTMLTransformer. "
+        "Responde siempre en español y asegúrate de que las instrucciones sean claras, útiles y fáciles de seguir."
     ),
     tools=[initiate_payment, check_payment_status],
-    handoff_description="Assists with payment processing using PayRetailers.",
+    handoff_description="Assists with online payment processing and troubleshooting for e-commerce platforms using PayRetailers.",
     output_type=PaymentAgentOutput
 )
 
