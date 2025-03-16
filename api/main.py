@@ -22,7 +22,7 @@ if USE_LOCAL_WHISPER_API:
     
 
 from openai.types.responses import ResponseContentPartDoneEvent, ResponseTextDeltaEvent
-from html_templates import generate_html_from_json  # Import the HTML templates module
+# from html_templates import generate_html_from_json  # Import the HTML templates module
 import tempfile # Import the tempfile module for temporary file handling
 
 # Set up Groq client
@@ -121,14 +121,23 @@ async def process(payload: dict, transcribed_text: str = None):
     #     response["last_agent"] = "main"
 
     # Generate HTML output using the html_templates module
-    html_output = generate_html_from_json(response)
+    # html_output = generate_html_from_json(response)
+
+    base_agent_response = response.get("data", {})
+    # Check if the response contains a "data" key
+    if not base_agent_response:
+        return JSONResponse(content={"error": "No data found in the response."}, status_code=400)
+    
+    print(base_agent_response)
+    
+    data = base_agent_response.data 
 
     # Return both raw data and HTML data
     return {
         "type": response.get("type"),
         "user_id": payload.get("user_id"),
-        "data": response.get("data"),
-        "html_data": html_output,
+        "data": data,
+        "html_data": data,
         "pain_points": response.get("pain_points"),
         "good_points": response.get("good_points"),
         "transcribed_text": transcribed_text if transcribed_text else None

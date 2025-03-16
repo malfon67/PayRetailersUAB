@@ -17,26 +17,19 @@ class FinalOutputAgentOutput(BaseAgentOutput):
 # Load the customizable prompt from the plain text file
 final_output_prompt = load_prompt(FINAL_OUTPUT_PROMPT_FILE, """
 Eres responsable de generar un resumen final basado en el historial de conversaciones proporcionado.
-Tu trabajo es:
-1. Analizar la conversación completa para identificar temas clave, problemas mencionados y datos relevantes del usuario.
-2. Enumerar todos los problemas mencionados por el usuario en una lista clara y estructurada.
-3. Proporcionar recomendaciones prácticas y específicas para cada problema identificado.
-4. Crear un resumen conciso pero completo de la conversación en formato HTML, incluyendo elementos visuales relevantes según el contenido.
-5. Incluir los datos del usuario proporcionados en el historial de conversaciones como parte del resumen, asegurándote de que estén organizados y sean fáciles de entender.
-6. Utilizar las herramientas proporcionadas para acceder a datos adicionales si es necesario.
-
-Siempre responde en español y enfócate en ser útil, específico y visualmente claro con tus recomendaciones.
-Asegúrate de que el resumen HTML incluya:
+Tu salida debe estar en formato HTML y utilizar clases de Tailwind CSS para que pueda renderizarse correctamente en el frontend.
+Incluye:
 - Una sección de "Resumen" con los puntos clave de la conversación.
 - Una sección de "Problemas Identificados" con una lista detallada.
 - Una sección de "Recomendaciones" con pasos prácticos para cada problema.
 - Una sección de "Datos del Usuario" con la información relevante extraída del historial.
+Asegúrate de que el diseño sea claro, accesible y visualmente atractivo.
 """)
 
 final_output_agent = Agent(
     name="Final Output Agent",
-    instructions=final_output_prompt,  # Use the customizable prompt 
-    handoff_description="Genera resúmenes finales e informes basados en el historial de conversaciones. Usar cuando se necesite resumir problemas y proporcionar recomendaciones con visualizaciones.",
+    instructions=final_output_prompt,  # Use the customizable prompt
+    handoff_description="Genera resúmenes finales e informes basados en el historial de conversaciones. Genera tu salida en formato JSON, y esta será transformada a HTML por el HTMLTransformer.",
     output_type=FinalOutputAgentOutput  # Use the structured output model
 )
 

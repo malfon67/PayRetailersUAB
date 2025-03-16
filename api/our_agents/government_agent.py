@@ -32,9 +32,8 @@ government_agent = Agent(
     name="Government Agent",
     instructions=(
         BASE_STARTING_PROMPT +
-        "You provide assistance with questions related to laws, government processes, "
-        "and other government-related topics. You can search the web for information "
-        "specific to the user's country and city. Respond only in Spanish."
+        "Proporciona asistencia con preguntas relacionadas con leyes y procesos gubernamentales. Genera tu salida en formato JSON, y esta será transformada a HTML por el HTMLTransformer. "
+        "Responde solo en español."
     ),
     tools=[get_government_info],
     handoff_description=(

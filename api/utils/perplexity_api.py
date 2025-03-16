@@ -24,8 +24,8 @@ def search_perplexity(query: str) -> dict:
             {
                 "role": "system",
                 "content": (
-                    "You are an artificial intelligence assistant and you need to "
-                    "engage in a helpful, detailed, polite conversation with a user."
+                    "You are an artificial intelligence assistant. Provide concise, "
+                    "helpful, and polite answers to the user's input. Don't be verbose"
                 ),
             },
             {   
@@ -41,6 +41,8 @@ def search_perplexity(query: str) -> dict:
         )
 
         # print(response)
+
+        print("We have perplexity answer!")
         
         # return {"status": "success", "query": query, "results": response}
         return response.choices[0].message.content

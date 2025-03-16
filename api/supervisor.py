@@ -1,6 +1,7 @@
 from typing import List, Dict, Any, Optional
 from agents import Agent, OpenAIChatCompletionsModel, RunResult
 from agents import Runner
+from transformers.html_transformer import HTMLTransformer
 from our_agents_definition.base_agent import BaseAgentOutput, BASE_STARTING_PROMPT
 
 class MainAgentOutput(BaseAgentOutput):
@@ -10,8 +11,10 @@ class MainAgentOutput(BaseAgentOutput):
     # additional_info: Optional[str] = None  # Add any specific fields for the main agent if needed
 
 class Supervisor:
-    def __init__(self, agents: List[Agent], model: OpenAIChatCompletionsModel, prompt: str):
+    def __init__(self, agents: List[Agent], model: OpenAIChatCompletionsModel, prompt: str, html_transformer: HTMLTransformer):
         self.agents = agents
+
+        self.html_transformer = html_transformer
 
         # Create the main assistant agent
         self.main_assistant = Agent(
@@ -40,9 +43,9 @@ class Supervisor:
         
         result = await Runner.run(self.main_assistant, input=formatted_input)
 
-        print("Last agent " + result.last_agent.name)
-        print(result.final_output)
+        result = self.html_transformer.transform_to_html(result.final_output)
+
+        # return result.final_output
+
         return result
-
-
 

@@ -82,7 +82,8 @@ climate_agent = Agent(
     name="Climate Agent",
     instructions=(
         BASE_STARTING_PROMPT +
-        "Proporciona asistencia con temas climáticos y ambientales. Puedes acceder a datos de NASA Earth Data y buscar consultas relacionadas con el clima en la web. Responde solo en español."
+        "Proporciona asistencia con temas climáticos y ambientales. Genera tu salida en formato JSON, y esta será transformada a HTML por el HTMLTransformer. "
+        "Responde solo en español."
     ),
     tools=[get_climate_data, get_environmental_risk, search_climate_info],
     handoff_description="Provides climate and environmental information.",

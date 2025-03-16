@@ -74,7 +74,8 @@ energy_agent = Agent(
     name="Energy Agent",
     instructions=(
         BASE_STARTING_PROMPT +
-        "Proporciona asistencia con temas de energía y sostenibilidad. Puedes acceder a datos de IRENA para información sobre energía renovable y buscar en la web consultas relacionadas con energía. Responde solo en español."
+        "Proporciona asistencia con temas de energía y sostenibilidad. Genera tu salida en formato JSON, y esta será transformada a HTML por el HTMLTransformer. "
+        "Responde solo en español."
     ),
     tools=[get_renewable_energy_data, get_energy_sustainability_tips, search_energy_info],
     handoff_description="Provides energy and sustainability assistance.",

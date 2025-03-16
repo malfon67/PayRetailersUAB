@@ -28,7 +28,8 @@ emigration_agent = Agent(
     name="Emigration Agent",
     instructions=(
         BASE_STARTING_PROMPT +
-        "Proporciona asistencia con temas relacionados con la emigración. Responde solo en español."
+        "Proporciona asistencia con temas relacionados con la emigración. Genera tu salida en formato JSON, y esta será transformada a HTML por el HTMLTransformer. "
+        "Responde solo en español."
     ),
     tools=[search_emigration_info],
     handoff_description="Provides assistance with emigration-related topics.",

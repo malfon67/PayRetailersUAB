@@ -1,14 +1,16 @@
 import os
 import importlib
 import re
+from groq import Groq
 from openai import AsyncAzureOpenAI
 from agents import Agent, set_default_openai_client, Runner, OpenAIChatCompletionsModel
+from our_agents_definition.base_agent import BaseAgentOutput
 from supervisor import Supervisor
 from settings import load_prompt, SUPERVISOR_PROMPT_FILE  # Import the new load_prompt function
 from dotenv import load_dotenv
-import asyncio
 import json  # Added import for JSON formatting
 from openai import AzureOpenAI
+from transformers.html_transformer  import HTMLTransformer  # Import HTMLTransformer
 
 # Load environment variables
 load_dotenv()
@@ -30,6 +32,10 @@ client = AzureOpenAI(
   azure_deployment=llm_model_name
 )
 
+# Set up Groq client
+groq_client = Groq(
+    api_key=os.getenv("GROQ_API_KEY"))
+
 # Set the default OpenAI client for the Agents SDK
 set_default_openai_client(openai_client, False)
 
@@ -37,6 +43,9 @@ azure_model = OpenAIChatCompletionsModel(
     model=llm_model_name,
     openai_client=openai_client,
 )
+
+# Instantiate HTMLTransformer
+html_transformer = HTMLTransformer(groq_client, llm_model_name)
 
 # Dynamically import all agents from the agents folder
 agents = []
@@ -51,8 +60,9 @@ for filename in os.listdir(agents_folder):
         # Access the exposed agent_instance directly
         agent_instance = getattr(module, "agent_instance", None)
         if agent_instance:
-            # Dynamically set the model for the agent
+            # Dynamically set the model and HTMLTransformer for the agent
             agent_instance.model = azure_model
+            agent_instance.html_transformer = html_transformer
             agents.append(agent_instance)
 
 # Print the names of the loaded agents
@@ -83,11 +93,12 @@ else:
 
 print("Supervisor prompt updated with guidelines")
 
-# Update supervisor to include specialized agents and the loaded prompt
+# Update supervisor to include specialized agents, the loaded prompt, and the HTMLTransformer
 supervisor_agent = Supervisor(
     agents=agents,
     model=azure_model,
-    prompt=supervisor_prompt
+    prompt=supervisor_prompt,
+    html_transformer=html_transformer
 )
 
 # Store conversation history and pain points in memory (can be replaced with a database for persistence)
@@ -166,31 +177,42 @@ async def handle_conversation(payload: dict) -> dict:
 
     # Handle the start of the conversation
     if payload_type == "start":
-        user_data = payload.get("user_data", {})
+        user_data_for_user = payload.get("user_data", {})  # Use a local variable to avoid shadowing the global dictionary
         
         # Format the user data as JSON, but avoid potential policy triggers
-        formatted_user_data = json.dumps(user_data, indent=2, ensure_ascii=False)
+        formatted_user_data = json.dumps(user_data_for_user, indent=2, ensure_ascii=False)
         user_context = f"Información de usuario:\n```json\n{formatted_user_data}\n```\n"
         user_context += "Inicia una conversación amable en español con esta persona. "
-        user_context += "Pregunta sobre cómo puedes ayudarle hoy. No utilizes ningún agente."
+        user_context += "Pregunta sobre cómo puedes ayudarle hoy. No utilices ningún agente especializado."
         user_context += "Simplemente comienza la conversación y deja que el sistema maneje el resto."
-        
+
         try:
             # Process the user context through the supervisor
-            result = await supervisor_agent.process_input(user_context)
+            # result = await supervisor_agent.process_input(user_context)
+
+            result = client.chat.completions.create(
+                model=llm_model_name,
+                messages=[
+                    {"role": "system", "content": user_context}
+                ]
+            )
+
+            output = result.choices[0].message.content
+
+            print(f"Initial conversation output: {output}")
 
             # Store conversation for future reference
             conversation_histories[user_id].append({"content": user_context, "role": "user"})
-            conversation_histories[user_id].append({"content": result.final_output, "role": "assistant"})
+            conversation_histories[user_id].append({"content": output, "role": "assistant"})
             
             return {
                 "type": "response",
                 "user_id": user_id,
-                "data": result.final_output,
-                "pain_points": [],
-                "good_points": [],
-                "last_agent": result.last_agent.name
-            } 
+                "data": output,
+                "pain_points": [],  # No pain points extracted at this stage
+                "good_points": [],  # No good points extracted at this stage
+                "last_agent": None  # No specialized agent used at this stage
+            }
         except Exception as e:
             print(f"Error processing initial conversation: {str(e)}")
             # Provide a safe fallback response
@@ -202,10 +224,10 @@ async def handle_conversation(payload: dict) -> dict:
             return {
                 "type": "response",
                 "user_id": user_id,
-                "data": fallback_response,
+                "data": BaseAgentOutput(agent_type="html", status="success", data=fallback_response),
                 "pain_points": [],
                 "good_points": [],
-                "last_agent": supervisor_agent.main_assistant.name
+                "last_agent": None
             } 
 
     # Handle sequential prompts
@@ -232,21 +254,22 @@ async def handle_conversation(payload: dict) -> dict:
             user_good_points[user_id] = list(set(user_good_points[user_id]))  # Ensure uniqueness
             
             # Process the user input through the supervisor agent
-            result = await supervisor_agent.process_input(prompt_text)
+            html_output = await supervisor_agent.process_input(prompt_text)
 
-            # print("response from supervisor agent", result)
+            # Extract the dynamically generated HTML from the agent's response
+            # html_output = result.final_output  # Assuming the agent returns HTML in final_output
 
             # Store conversation for future reference
             conversation_histories[user_id].append({"content": prompt_text, "role": "user"})
-            conversation_histories[user_id].append({"content": result.final_output, "role": "assistant"})
+            conversation_histories[user_id].append({"content": html_output, "role": "assistant"})
 
             return {
                 "type": "response",
                 "user_id": user_id,
-                "data": result.final_output,
+                "data": html_output,  # Return the HTML output directly
                 "pain_points": user_pain_points[user_id],
                 "good_points": user_good_points[user_id],
-                "last_agent": result.last_agent.name
+                # "last_agent": result.last_agent.name
             } 
         except Exception as e:
             print(f"Error processing prompt: {str(e)}")
@@ -261,7 +284,7 @@ async def handle_conversation(payload: dict) -> dict:
             return {
                 "type": "response",
                 "user_id": user_id,
-                "data": fallback_response,
+                "data": BaseAgentOutput(agent_type="html", status="success", data=fallback_response),
                 "pain_points": user_pain_points[user_id],
                 "good_points": user_good_points[user_id],
                 "last_agent": supervisor_agent.main_assistant.name
@@ -279,6 +302,9 @@ async def handle_conversation(payload: dict) -> dict:
             conversation_text += f"{role.capitalize()}: {content}\n\n"
         
         try:
+            # Ensure user_data is initialized for the user
+            user_data_for_user = user_data.get(user_id, {})
+
             # Find the Final Output Agent in the list of agents
             final_output_agent = None
             for agent in agents:
@@ -293,7 +319,7 @@ async def handle_conversation(payload: dict) -> dict:
                 # Prepare structured input for the Final Output Agent
                 final_input = {
                     "conversation": conversation_text,
-                    "user_data": json.dumps(user_data.get(user_id, {}), ensure_ascii=False),
+                    "user_data": json.dumps(user_data_for_user, ensure_ascii=False),
                     "pain_points": user_pain_points.get(user_id, []),
                     "good_points": user_good_points.get(user_id, [])
                 }
@@ -301,7 +327,8 @@ async def handle_conversation(payload: dict) -> dict:
                 # Format input for the Final Output Agent
                 formatted_input = [{"content": json.dumps(final_input), "role": "user"}]
                 result = await Runner.run(final_output_agent, input=formatted_input)
-                final_output = result.final_output
+                
+                final_output = html_transformer.transform_to_html(result.final_output)
                 
                 # Clean up conversation history
                 conversation_histories.pop(user_id, None)
@@ -309,7 +336,6 @@ async def handle_conversation(payload: dict) -> dict:
                 return {
                     "type": "final_response", 
                     "data": final_output,
-                    "content_type": "text/html",
                     "pain_points": user_pain_points.pop(user_id, []),
                     "good_points": user_good_points.pop(user_id, []),
                     "last_agent": final_output_agent.name
@@ -317,15 +343,15 @@ async def handle_conversation(payload: dict) -> dict:
             else:
                 # Fall back to the supervisor if the Final Output Agent isn't found
                 print("Final Output Agent not found, using supervisor agent instead")
-                result = await supervisor_agent.process_input(conversation_text)
-                final_output = result.final_output
+                final_output = await supervisor_agent.process_input(conversation_text)
+                # final_output = result.final_output
                 
                 # Clean up conversation history
                 conversation_histories.pop(user_id, None)
                 
                 return {
                     "type": "response",
-                    "data": final_output,
+                    "data": BaseAgentOutput(agent_type="html", status="success", data=final_output),
                     "pain_points": user_pain_points.pop(user_id, []),
                     "good_points": user_good_points.pop(user_id, []),
                     "last_agent": supervisor_agent.main_assistant.name

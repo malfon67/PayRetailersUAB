@@ -100,7 +100,8 @@ money_agent = Agent(
     name="Money Agent",
     instructions=(
         BASE_STARTING_PROMPT +
-        "Proporciona asistencia con temas financieros y bancarios. Puedes acceder a datos del Banco Mundial y buscar información financiera en la web. Responde solo en español."
+        "Proporciona asistencia con temas financieros y bancarios. Genera tu salida en formato JSON, y esta será transformada a HTML por el HTMLTransformer. "
+        "Responde solo en español."
     ),
     tools=[search_financial_info],
     handoff_description="Provides financial and banking assistance.",
