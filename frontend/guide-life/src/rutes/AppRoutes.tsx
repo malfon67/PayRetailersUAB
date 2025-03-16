@@ -9,7 +9,7 @@ const AppRoutes = () => {
       <Routes>
         <Route path="/form" element={<FormPage />} />
         <Route path="/chat" element={<Chat />} />
-        <Route path="*" element={<Navigate to="/chat" replace />} />
+        <Route path="*" element={<Navigate to="/form" replace />} />
       </Routes>
     </Router>
   );

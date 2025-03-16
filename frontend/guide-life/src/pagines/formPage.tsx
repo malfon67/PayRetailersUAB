@@ -1,30 +1,18 @@
 import Form from '../components/form';
-
-interface FormData {
-  username: string;
-  password: string;
-}
+import { submitFormData, FormData } from '../components/endpoints';
+import { useNavigate } from "react-router-dom"; // Importa useNavigate
 
 const FormPage = () => {
+  const navigate = useNavigate(); // Inicialitza useNavigate
+
   const handleFormSubmit = async (formData: FormData) => {
     console.log('Form Data:', formData);
 
-    // Envia les dades a una API
     try {
-      const response = await fetch('https://api.example.com/submit', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(formData),
-      });
-
-      if (!response.ok) {
-        throw new Error('Error en enviar les dades');
-      }
-
-      const result = await response.json();
+      const result = await submitFormData(formData);
       console.log('Resposta de l\'API:', result);
+      navigate("/chat"); // Redirigeix a la pàgina de confirmació
+
     } catch (error) {
       console.error('Error:', error);
     }
