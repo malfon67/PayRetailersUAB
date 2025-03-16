@@ -1,46 +1,75 @@
-# Getting Started with Create React App
+# Guide Life Frontend
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+This is the front-end application for the Guide Life project, built using **React** and styled with **Tailwind CSS**. The application provides an interactive user interface for features like chat, audio recording, and data visualization.
 
-## Available Scripts
+## Features
 
-In the project directory, you can run:
+- **Chat Interface**: A conversational interface with AI responses.
+- **Audio Recorder**: Record and upload audio for processing.
+- **Dynamic Summaries**: Display positive and negative points based on AI analysis.
+- **Responsive Design**: Styled with Tailwind CSS for a modern and responsive UI.
 
-### `npm start`
+## Project Structure
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+- **`src`**: Contains the main React components and pages.
+  - **`pagines`**: Includes key pages like `chat.tsx`, `audioRecorder.tsx`, and `summary.tsx`.
+  - **`components`**: Reusable components like `userInput_API` and `userAudio_API`.
+  - **`App.tsx`**: Main entry point for the application.
+- **`public`**: Static assets and configuration files.
+  - **`lib`**: Includes JSON data files like `countriesWithCities.json` and utility scripts like `fetching.js`.
+  - **`tailwind.css`**: Tailwind CSS configuration for styling.
+- **`tailwind.config.js`**: Tailwind CSS configuration file.
+- **`postcss.config.js`**: PostCSS configuration for processing CSS.
 
-The page will reload if you make edits.\
-You will also see any lint errors in the console.
+## Setup Instructions
 
-### `npm test`
+1. **Clone the Repository**:
+   ```bash
+   git clone <repository-url>
+   cd guide-life
+   ```
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+2. **Install Dependencies**:
+   Ensure you have Node.js installed, then run:
+   ```bash
+   npm install
+   ```
 
-### `npm run build`
+3. **Run the Development Server**:
+   Start the application locally:
+   ```bash
+   npm start
+   ```
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+4. **Build for Production**:
+   Create a production-ready build:
+   ```bash
+   npm run build
+   ```
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+## Key Dependencies
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+- **React**: For building the user interface.
+- **Tailwind CSS**: For styling.
+- **React Router**: For navigation between pages.
+- **TypeScript**: For type safety and better development experience.
 
-### `npm run eject`
+## Scripts
 
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
+- `npm start`: Runs the app in development mode.
+- `npm run build`: Builds the app for production.
+- `npm test`: Runs the test suite.
 
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+## Notes
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
+- The `countriesWithCities.json` file contains geographical data used in the application.
+- The `fetching.js` script demonstrates how to fetch and process data from external APIs.
 
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
+## Contributing
 
-## Learn More
+Feel free to fork the repository and submit pull requests for improvements or bug fixes.
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+## License
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+This project is licensed under the MIT License.
+
