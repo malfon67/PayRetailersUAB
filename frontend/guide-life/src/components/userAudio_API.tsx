@@ -1,4 +1,4 @@
-const prompt_url = "https://b879-158-109-94-92.ngrok-free.app/audio-input";
+const prompt_url = "https://6bbe-158-109-94-92.ngrok-free.app/audio-input";
 
 interface PromptResponse {
   user_id?: string;

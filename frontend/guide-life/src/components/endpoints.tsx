@@ -48,7 +48,7 @@ export interface FormData {
     };
   
     try {
-      const response = await fetch("https://e60b-158-109-94-92.ngrok-free.app/process-input", {
+      const response = await fetch("https://6bbe-158-109-94-92.ngrok-free.app/process-input", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
