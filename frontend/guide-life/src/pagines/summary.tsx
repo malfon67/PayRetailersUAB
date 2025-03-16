@@ -1,11 +1,9 @@
 import React from "react";
 
-export const Summary = () => {
+export const Summary = (/*html_output?: string*/) => {
   return (
-    <div className="flex justify-center items-center">
-      <div className="rounded-full h-6 w-6 border-t-2 border-blue-500 border-solid">
-        Plana 3 en proceso
-      </div>
+    <div className="w-full h-full flex flex-col justify-start items-center">
+        <p className="text-2xl mt-2 font-bold">Informe final</p>
     </div>
   );
 };
