@@ -1,0 +1,302 @@
+[
+  {
+    "name": "Colombia",
+    "code": "CO",
+    "subregion": "South America",
+    "region": "Americas"
+  },
+  {
+    "name": "Curaçao",
+    "code": "CW",
+    "subregion": "Caribbean",
+    "region": "Americas"
+  },
+  {
+    "name": "French Guiana",
+    "code": "GF",
+    "subregion": "South America",
+    "region": "Americas"
+  },
+  {
+    "name": "Grenada",
+    "code": "GD",
+    "subregion": "Caribbean",
+    "region": "Americas"
+  },
+  {
+    "name": "Sint Maarten",
+    "code": "SX",
+    "subregion": "Caribbean",
+    "region": "Americas"
+  },
+  {
+    "name": "Argentina",
+    "code": "AR",
+    "subregion": "South America",
+    "region": "Americas"
+  },
+  {
+    "name": "Turks and Caicos Islands",
+    "code": "TC",
+    "subregion": "Caribbean",
+    "region": "Americas"
+  },
+  {
+    "name": "Dominica",
+    "code": "DM",
+    "subregion": "Caribbean",
+    "region": "Americas"
+  },
+  {
+    "name": "Costa Rica",
+    "code": "CR",
+    "subregion": "Central America",
+    "region": "Americas"
+  },
+  {
+    "name": "Haiti",
+    "code": "HT",
+    "subregion": "Caribbean",
+    "region": "Americas"
+  },
+  {
+    "name": "Barbados",
+    "code": "BB",
+    "subregion": "Caribbean",
+    "region": "Americas"
+  },
+  {
+    "name": "Honduras",
+    "code": "HN",
+    "subregion": "Central America",
+    "region": "Americas"
+  },
+  {
+    "name": "Puerto Rico",
+    "code": "PR",
+    "subregion": "Caribbean",
+    "region": "Americas"
+  },
+  {
+    "name": "Falkland Islands",
+    "code": "FK",
+    "subregion": "South America",
+    "region": "Americas"
+  },
+  {
+    "name": "Saint Kitts and Nevis",
+    "code": "KN",
+    "subregion": "Caribbean",
+    "region": "Americas"
+  },
+  {
+    "name": "Saint Lucia",
+    "code": "LC",
+    "subregion": "Caribbean",
+    "region": "Americas"
+  },
+  {
+    "name": "Caribbean Netherlands",
+    "code": "BQ",
+    "subregion": "Caribbean",
+    "region": "Americas"
+  },
+  {
+    "name": "Bolivia",
+    "code": "BO",
+    "subregion": "South America",
+    "region": "Americas"
+  },
+  {
+    "name": "Chile",
+    "code": "CL",
+    "subregion": "South America",
+    "region": "Americas"
+  },
+  {
+    "name": "Guadeloupe",
+    "code": "GP",
+    "subregion": "Caribbean",
+    "region": "Americas"
+  },
+  {
+    "name": "Mexico",
+    "code": "MX",
+    "subregion": "North America",
+    "region": "Americas"
+  },
+  {
+    "name": "Saint Vincent and the Grenadines",
+    "code": "VC",
+    "subregion": "Caribbean",
+    "region": "Americas"
+  },
+  {
+    "name": "Dominican Republic",
+    "code": "DO",
+    "subregion": "Caribbean",
+    "region": "Americas"
+  },
+  {
+    "name": "Guatemala",
+    "code": "GT",
+    "subregion": "Central America",
+    "region": "Americas"
+  },
+  {
+    "name": "Ecuador",
+    "code": "EC",
+    "subregion": "South America",
+    "region": "Americas"
+  },
+  {
+    "name": "Martinique",
+    "code": "MQ",
+    "subregion": "Caribbean",
+    "region": "Americas"
+  },
+  {
+    "name": "Suriname",
+    "code": "SR",
+    "subregion": "South America",
+    "region": "Americas"
+  },
+  {
+    "name": "Saint Barthélemy",
+    "code": "BL",
+    "subregion": "Caribbean",
+    "region": "Americas"
+  },
+  {
+    "name": "Bahamas",
+    "code": "BS",
+    "subregion": "Caribbean",
+    "region": "Americas"
+  },
+  {
+    "name": "Paraguay",
+    "code": "PY",
+    "subregion": "South America",
+    "region": "Americas"
+  },
+  {
+    "name": "British Virgin Islands",
+    "code": "VG",
+    "subregion": "Caribbean",
+    "region": "Americas"
+  },
+  {
+    "name": "Brazil",
+    "code": "BR",
+    "subregion": "South America",
+    "region": "Americas"
+  },
+  {
+    "name": "Belize",
+    "code": "BZ",
+    "subregion": "Central America",
+    "region": "Americas"
+  },
+  {
+    "name": "Venezuela",
+    "code": "VE",
+    "subregion": "South America",
+    "region": "Americas"
+  },
+  {
+    "name": "El Salvador",
+    "code": "SV",
+    "subregion": "Central America",
+    "region": "Americas"
+  },
+  {
+    "name": "Peru",
+    "code": "PE",
+    "subregion": "South America",
+    "region": "Americas"
+  },
+  {
+    "name": "Trinidad and Tobago",
+    "code": "TT",
+    "subregion": "Caribbean",
+    "region": "Americas"
+  },
+  {
+    "name": "Guyana",
+    "code": "GY",
+    "subregion": "South America",
+    "region": "Americas"
+  },
+  {
+    "name": "Jamaica",
+    "code": "JM",
+    "subregion": "Caribbean",
+    "region": "Americas"
+  },
+  {
+    "name": "Aruba",
+    "code": "AW",
+    "subregion": "Caribbean",
+    "region": "Americas"
+  },
+  {
+    "name": "Cayman Islands",
+    "code": "KY",
+    "subregion": "Caribbean",
+    "region": "Americas"
+  },
+  {
+    "name": "Cuba",
+    "code": "CU",
+    "subregion": "Caribbean",
+    "region": "Americas"
+  },
+  {
+    "name": "Uruguay",
+    "code": "UY",
+    "subregion": "South America",
+    "region": "Americas"
+  },
+  {
+    "name": "Saint Martin",
+    "code": "MF",
+    "subregion": "Caribbean",
+    "region": "Americas"
+  },
+  {
+    "name": "Antigua and Barbuda",
+    "code": "AG",
+    "subregion": "Caribbean",
+    "region": "Americas"
+  },
+  {
+    "name": "Panama",
+    "code": "PA",
+    "subregion": "Central America",
+    "region": "Americas"
+  },
+  {
+    "name": "Montserrat",
+    "code": "MS",
+    "subregion": "Caribbean",
+    "region": "Americas"
+  },
+  {
+    "name": "Nicaragua",
+    "code": "NI",
+    "subregion": "Central America",
+    "region": "Americas"
+  },
+  {
+    "name": "United States Virgin Islands",
+    "code": "VI",
+    "subregion": "Caribbean",
+    "region": "Americas"
+  },
+  {
+    "name": "Anguilla",
+    "code": "AI",
+    "subregion": "Caribbean",
+    "region": "Americas"
+  }
+]
