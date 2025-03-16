@@ -1,4 +1,4 @@
-const prompt_url = "https://f7ae-158-109-94-92.ngrok-free.app/process-input";
+const prompt_url = "https://b879-158-109-94-92.ngrok-free.app/process-input";
 
 interface PromptResponse {
   data?: string; // Adjust type based on actual API response

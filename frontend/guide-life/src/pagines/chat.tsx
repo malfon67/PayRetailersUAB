@@ -56,10 +56,13 @@ export default function Chat() {
       try {
         setLoading(true);
   
-        // Remove "recording..." message before sending "loading..."
-        setMessages((prev) => prev.slice(0, -1));
+        // Remove "recording..." message before sending "esperando texto..."
+        setMessages((prev) => [
+          ...prev.slice(0, -1),
+          { sender: "user", text: "Cargando transcripción" }
+        ]);
   
-        // Add "loading..." message
+        // Add "loading..." message from bot
         setMessages((prev) => [...prev, { sender: "bot", type: "loading" }]);
   
         const out = await sendUserAudio("XXX", fileUrl);
@@ -67,28 +70,30 @@ export default function Chat() {
         const data: string = out?.data || "";
         const goodPoints: string[] = out?.good_points || [];
         const badPoints: string[] = out?.pain_points || [];
+        const transcript: string = out?.transcribed_text || "";
   
         setGoodPoints(goodPoints);
         setBadPoints(badPoints);
         setLoading(false);
   
-        // Remove "loading..." message before adding response
+        // Replace "esperando texto..." with the actual transcript
         setMessages((prev) => [
-          ...prev.slice(0, -1), 
-          { sender: "user", text: "Audio grabado" },
+          ...prev.slice(0, -2), // Remove "esperando texto..." and "loading..."
+          { sender: "user", text: transcript || "Esperando transcripción" },
           { text: data, sender: "bot", html_data },
         ]);
   
       } catch (error) {
         console.error("Error uploading file:", error);
         setMessages((prev) => [
-          ...prev.slice(0, -1), 
+          ...prev.slice(0, -1),
           { sender: "bot", text: "Error retrieving data!" },
         ]);
         setLoading(false);
       }
     }
   };
+  
   
 
   const handleSend = async (type: "prompt" | "stop" = "prompt") => {
@@ -126,43 +131,43 @@ export default function Chat() {
 
   return (
     <div className="h-screen w-screen flex justify-center items-center bg-gray-200 px-2">
-      <div className="w-full max-w-lg h-[calc(100%-15px)] bg-white border-4 border-gray-500 rounded-lg shadow-lg p-4 flex flex-col">
+      <div className="w-1/2 h-[calc(100%-15px)] bg-white border-4 border-gray-500 rounded-lg shadow-lg p-4 flex flex-col">
         {/* Avatar Header */}
         <div className="flex items-center space-x-4 mb-4 border-b pb-2">
           <img src="/avatar.svg" alt="Antonia the AI" className="w-12 h-12 rounded-full" />
           <div>
-            <h2 className="text-lg font-semibold">Ramón, tu asistente</h2>
+            <h2 className="text-lg font-semibold">Antonia</h2>
             <p className="text-sm text-gray-500">En línia</p>
           </div>
         </div>
 
         {/* Messages Area */}
         <div className="flex-1 h-[350px] overflow-y-auto border border-gray-300 p-2 rounded-lg space-y-2">
-          {messages.map((msg, index) => (
-            <div key={index} className={`flex ${msg.sender === "user" ? "justify-end" : "justify-start"}`}>
-              <div
-                className={`w-fit max-w-[70%] p-2 my-1 rounded-lg border text-sm ${
-                  msg.type === "loading" || msg.type === "recording"
-                    ? ""
-                    : msg.sender === "user"
-                    ? "bg-blue-500 text-white border-blue-700"
-                    : "bg-gray-300 border-gray-400"
-                }`}
-              >
-                {msg.type === "loading" ? (
-                  <LoadingSpinner />
-                ) : msg.type === "recording" && recordingInfo ? (
-                  <AudioSpinner />
-                ) : msg.html_data ? (
-                  <div dangerouslySetInnerHTML={{ __html: msg.html_data }}></div>
-                ) : (
-                  msg.text
-                )}
-              </div>
+        {messages.map((msg, index) => (
+          <div key={index} className={`flex ${msg.sender === "user" ? "justify-end" : "justify-start"}`}>
+            <div
+              className={`w-fit p-2 my-1 rounded-lg border text-sm 
+                ${msg.type === "loading" || msg.type === "recording"
+                  ? "max-w-[90%]" // Keep type messages at 90% max width
+                  : msg.sender === "user"
+                  ? "max-w-[60%] bg-blue-500 text-white border-blue-700" // User messages at 60% max width
+                  : "max-w-[90%] bg-gray-300 border-gray-400" // Other messages at 90% max width
+              }`}
+            >
+              {msg.type === "loading" ? (
+                <LoadingSpinner />
+              ) : msg.type === "recording" && recordingInfo ? (
+                <AudioSpinner />
+              ) : msg.html_data ? (
+                <div dangerouslySetInnerHTML={{ __html: msg.html_data }}></div>
+              ) : (
+                msg.text
+              )}
             </div>
-          ))}
-          <div ref={messagesEndRef} />
-        </div>
+          </div>
+        ))}
+        <div ref={messagesEndRef} />
+      </div>
 
         {/* Input Field & Send Button */}
         <div className="flex flex-col sm:flex-row mt-2 space-y-2 sm:space-y-0 sm:space-x-2">
