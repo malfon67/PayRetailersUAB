@@ -72,7 +72,7 @@ def transcribe_audio_with_groq(audio_file_path: str) -> str:
                 model="whisper-large-v3",
                 prompt="""Transcribe the audio to text. Always respond in Spanish.""",
                 response_format="text",
-                language="en",
+                language="es",
             )
         return transcription  # This is now directly the transcription text
     except Exception as e:
@@ -116,9 +116,9 @@ async def process(payload: dict) -> dict:
     if "error" in response:
         return JSONResponse(content={"error": response["error"]}, status_code=response.get("status_code", 400))
 
-    # Check if the response is from the main agent and set agent_type to "main"
-    if "agent_type" not in response:
-        response["agent_type"] = "main"
+    # # Check if the response is from the main agent and set agent_type to "main"
+    # if "last_agent" not in response:
+    #     response["last_agent"] = "main"
 
     # Generate HTML output using the html_templates module
     html_output = generate_html_from_json(response)

@@ -3,6 +3,16 @@ import requests
 from agents import Agent, function_tool
 import os
 from utils.perplexity_api import search_perplexity
+from our_agents_definition.base_agent import BaseAgentOutput, BASE_STARTING_PROMPT
+from typing import Optional
+
+class ClimateAgentOutput(BaseAgentOutput):
+    """
+    Output model for the Climate Agent.
+    """
+    latitude: Optional[float] = None
+    longitude: Optional[float] = None
+    risk: Optional[str] = None
 
 @function_tool
 def get_climate_data(lat: float, lon: float) -> dict:
@@ -70,9 +80,13 @@ def search_climate_info(query: str) -> dict:
 
 climate_agent = Agent(
     name="Climate Agent",
-    instructions="You provide assistance with climate and environmental topics. You can access NASA Earth Data for climate information and search the web for climate-related queries. Respond only in Spanish.",
+    instructions=(
+        BASE_STARTING_PROMPT +
+        "Proporciona asistencia con temas climáticos y ambientales. Puedes acceder a datos de NASA Earth Data y buscar consultas relacionadas con el clima en la web. Responde solo en español."
+    ),
     tools=[get_climate_data, get_environmental_risk, search_climate_info],
-    handoff_description="Provides climate and environmental information, can access NASA Earth data and search the web for climate-related information. Use for questions about climate change, weather patterns, or environmental risks."
+    handoff_description="Provides climate and environmental information.",
+    output_type=ClimateAgentOutput
 )
 
 # Expose the agent instance for dynamic imports

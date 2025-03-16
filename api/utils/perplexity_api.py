@@ -40,8 +40,9 @@ def search_perplexity(query: str) -> dict:
             messages=messages,
         )
 
-        print(response)
+        # print(response)
         
-        return {"status": "success", "query": query, "results": response}
+        # return {"status": "success", "query": query, "results": response}
+        return response.choices[0].message.content
     except Exception as e:
         return {"status": "error", "message": f"Error in search: {str(e)}"}

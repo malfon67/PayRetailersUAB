@@ -2,6 +2,16 @@ import asyncio
 import requests
 from agents import Agent, function_tool
 from utils.perplexity_api import search_perplexity
+from our_agents_definition.base_agent import BaseAgentOutput, BASE_STARTING_PROMPT
+from typing import Optional
+
+class HealthAgentOutput(BaseAgentOutput):
+    """
+    Output model for the Health Agent.
+    """
+    country_code: Optional[str] = None
+    indicator: Optional[str] = None
+    value: Optional[str] = None
 
 @function_tool
 def get_who_health_data(country_code: str, indicator: str) -> dict:
@@ -40,13 +50,18 @@ def search_health_info(query: str) -> dict:
     """
     print("Health Agent is performing an internet search for health information.")
     result = search_perplexity(query)
-    return {"agent_type": "health", **result}
+    return {"agent_type": "health", "data": result}
+
 
 health_agent = Agent(
     name="Health Agent",
-    instructions="You provide assistance with health-related topics. You can access WHO data for health indicators and search the web for health information. Respond only in Spanish.",
+    instructions=(
+        BASE_STARTING_PROMPT +
+        "Proporciona asistencia con temas relacionados con la salud. Puedes acceder a datos de la OMS y buscar información de salud en la web. Responde solo en español."
+    ),
     tools=[get_who_health_data, search_health_info],
-    handoff_description="Provides health-related assistance, can access WHO health data and search the web for health information. Use for questions about medical conditions, health advice, or wellness information."
+    handoff_description="Provides health-related assistance.",
+    output_type=HealthAgentOutput
 )
 
 # Expose the agent instance for dynamic imports

@@ -2,6 +2,15 @@ import asyncio
 import requests
 from agents import Agent, function_tool
 from utils.perplexity_api import search_perplexity
+from our_agents_definition.base_agent import BaseAgentOutput, BASE_STARTING_PROMPT
+from typing import Optional
+
+class EnergyAgentOutput(BaseAgentOutput):
+    """
+    Output model for the Energy Agent.
+    """
+    country: Optional[str] = None
+    tips: Optional[list[str]] = None
 
 @function_tool
 def get_renewable_energy_data(country: str) -> dict:
@@ -58,13 +67,18 @@ def search_energy_info(query: str) -> dict:
     """
     print("Energy Agent is performing an internet search for energy information.")
     result = search_perplexity(query)
-    return {"agent_type": "energy", **result}
+    print(result)
+    return {"agent_type": "energy", "data": result}
 
 energy_agent = Agent(
     name="Energy Agent",
-    instructions="You provide assistance with energy and sustainability topics. You can access IRENA data for renewable energy information and search the web for energy-related queries. Respond only in Spanish.",
+    instructions=(
+        BASE_STARTING_PROMPT +
+        "Proporciona asistencia con temas de energía y sostenibilidad. Puedes acceder a datos de IRENA para información sobre energía renovable y buscar en la web consultas relacionadas con energía. Responde solo en español."
+    ),
     tools=[get_renewable_energy_data, get_energy_sustainability_tips, search_energy_info],
-    handoff_description="Provides energy and sustainability assistance, can access IRENA renewable energy data and search the web for energy-related information. Use for questions about renewable energy, energy efficiency, or sustainability practices."
+    handoff_description="Provides energy and sustainability assistance.",
+    output_type=EnergyAgentOutput
 )
 
 # Expose the agent instance for dynamic imports

@@ -2,6 +2,16 @@ import asyncio
 import requests
 from agents import Agent, function_tool
 from utils.perplexity_api import search_perplexity
+from our_agents_definition.base_agent import BaseAgentOutput, BASE_STARTING_PROMPT
+from typing import Optional
+
+class MoneyAgentOutput(BaseAgentOutput):
+    """
+    Output model for the Money Agent.
+    """
+    # topic: Optional[str] = None
+    # advice: Optional[str] = None
+    # value: Optional[float] = None
 
 @function_tool
 def get_financial_advice(topic: str) -> dict:
@@ -83,13 +93,18 @@ def search_financial_info(query: str) -> dict:
     """
     print("Money Agent is performing an internet search for financial information.")
     result = search_perplexity(query)
-    return {"agent_type": "money", **result}
+    return {"agent_type": "money", "data": result}
+
 
 money_agent = Agent(
     name="Money Agent",
-    instructions="You provide assistance with financial and banking topics. You can access World Bank data for economic indicators and search the web for financial information. Respond only in Spanish.",
-    tools=[get_financial_advice, get_world_bank_data, get_eclac_data, search_financial_info],
-    handoff_description="Provides financial and banking assistance, can access World Bank economic data, ECLAC socioeconomic data, and search the web for financial information. Use for questions about money, banking, investments, or financial advice."
+    instructions=(
+        BASE_STARTING_PROMPT +
+        "Proporciona asistencia con temas financieros y bancarios. Puedes acceder a datos del Banco Mundial y buscar información financiera en la web. Responde solo en español."
+    ),
+    tools=[search_financial_info],
+    handoff_description="Provides financial and banking assistance.",
+    output_type=MoneyAgentOutput
 )
 
 # Expose the agent instance for dynamic imports

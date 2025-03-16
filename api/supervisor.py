@@ -1,6 +1,13 @@
-from typing import List, Dict, Any
+from typing import List, Dict, Any, Optional
 from agents import Agent, OpenAIChatCompletionsModel, RunResult
 from agents import Runner
+from our_agents_definition.base_agent import BaseAgentOutput, BASE_STARTING_PROMPT
+
+class MainAgentOutput(BaseAgentOutput):
+    """
+    Output model for the Main Assistant.
+    """
+    additional_info: Optional[str] = None  # Add any specific fields for the main agent if needed
 
 class Supervisor:
     def __init__(self, agents: List[Agent], model: OpenAIChatCompletionsModel, prompt: str):
@@ -9,9 +16,13 @@ class Supervisor:
         # Create the main assistant agent
         self.main_assistant = Agent(
             name="Main Assistant",
-            instructions=prompt,  # Use the provided prompt
+            instructions=(
+                BASE_STARTING_PROMPT +
+                prompt  # Use the provided prompt
+            ),
             model=model,
             handoffs=agents,
+            output_type=MainAgentOutput  # Use the base output type with optional extensions
         )
 
     async def process_input(self, input_text: str) -> RunResult:
@@ -28,6 +39,9 @@ class Supervisor:
         formatted_input = [{"content": input_text, "role": "user"}]
         
         result = await Runner.run(self.main_assistant, input=formatted_input)
+
+        print("Last agent " + result.last_agent.name)
+        print(result.final_output)
         return result
 
 

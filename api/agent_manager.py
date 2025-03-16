@@ -201,8 +201,8 @@ async def handle_conversation(payload: dict) -> dict:
             # Extract pain points using the new function
             points = await extract_points_from_response(prompt_text)
 
-            new_pain_points = points.pain_points
-            new_good_points = points.good_points
+            new_pain_points = [point.capitalize() for point in points.pain_points]
+            new_good_points = [point.capitalize() for point in points.good_points]
 
             print(f"Extracted pain points: {new_pain_points} from user_id: {user_id}")
             
@@ -217,6 +217,8 @@ async def handle_conversation(payload: dict) -> dict:
             # Process the user input through the supervisor agent
             result = await supervisor_agent.process_input(prompt_text)
 
+            # print("response from supervisor agent", result)
+
             # Store conversation for future reference
             conversation_histories[user_id].append({"content": prompt_text, "role": "user"})
             conversation_histories[user_id].append({"content": result.final_output, "role": "assistant"})
@@ -226,7 +228,8 @@ async def handle_conversation(payload: dict) -> dict:
                 "user_id": user_id,
                 "data": result.final_output,
                 "pain_points": user_pain_points[user_id],
-                "good_points": user_good_points[user_id]
+                "good_points": user_good_points[user_id],
+                "last_agent": result.last_agent.name
             } 
         except Exception as e:
             print(f"Error processing prompt: {str(e)}")
@@ -268,34 +271,18 @@ async def handle_conversation(payload: dict) -> dict:
             if final_output_agent:
                 print(f"Using agent: {final_output_agent.name} for final summary")
                 
-                # Prepare prompt for HTML output
-                final_prompt = f"""
-                Por favor, analiza esta conversación y genera un resumen en HTML con visualizaciones relevantes.
-                Además, devuelve los puntos problemáticos identificados en formato JSON con la estructura:
-                {{
-                    "pain_points": ["problema_1", "problema_2", ...]
-                }}
-                
-                Conversación:
-                {conversation_text}
-                """
+                # Prepare structured input for the Final Output Agent
+                final_input = {
+                    "conversation": conversation_text,
+                    "user_data": json.dumps(user_data.get(user_id, {}), ensure_ascii=False),
+                    "pain_points": user_pain_points.get(user_id, []),
+                    "good_points": user_good_points.get(user_id, [])
+                }
                 
                 # Format input for the Final Output Agent
-                formatted_input = [{"content": final_prompt, "role": "user"}]
+                formatted_input = [{"content": json.dumps(final_input), "role": "user"}]
                 result = await Runner.run(final_output_agent, input=formatted_input)
                 final_output = result.final_output
-                
-                # Append any new pain points from the final summary
-                points  = await extract_points_from_response(conversation_text)
-
-                new_pain_points = points.pain_points
-                new_good_points = points.good_points
-
-                user_pain_points[user_id].extend(new_pain_points)
-                user_pain_points[user_id] = list(set(user_pain_points[user_id]))  # Ensure uniqueness
-
-                user_good_points[user_id].extend(new_good_points)
-                user_good_points[user_id] = list(set(user_good_points[user_id]))  # Ensure uniqueness
                 
                 # Clean up conversation history
                 conversation_histories.pop(user_id, None)
@@ -305,25 +292,14 @@ async def handle_conversation(payload: dict) -> dict:
                     "data": final_output,
                     "content_type": "text/html",
                     "pain_points": user_pain_points.pop(user_id, []),
-                    "good_points": user_good_points.pop(user_id, [])
+                    "good_points": user_good_points.pop(user_id, []),
+                    "last_agent": final_output_agent.name
                 }
             else:
                 # Fall back to the supervisor if the Final Output Agent isn't found
                 print("Final Output Agent not found, using supervisor agent instead")
-                result = await supervisor_agent.process_input(final_prompt)
+                result = await supervisor_agent.process_input(conversation_text)
                 final_output = result.final_output
-                
-                # Append any new pain points from the final summary
-                points = await extract_points_from_response(conversation_text)
-
-                new_pain_points = points.pain_points
-                new_good_points = points.good_points
-
-                user_pain_points[user_id].extend(new_pain_points)
-                user_pain_points[user_id] = list(set(user_pain_points[user_id]))  # Ensure uniqueness
-
-                user_good_points[user_id].extend(new_good_points)
-                user_good_points[user_id] = list(set(user_good_points[user_id]))  # Ensure uniqueness
                 
                 # Clean up conversation history
                 conversation_histories.pop(user_id, None)
@@ -332,7 +308,8 @@ async def handle_conversation(payload: dict) -> dict:
                     "type": "response",
                     "data": final_output,
                     "pain_points": user_pain_points.pop(user_id, []),
-                    "good_points": user_good_points.pop(user_id, [])
+                    "good_points": user_good_points.pop(user_id, []),
+                    "last_agent": supervisor_agent.main_assistant.name
                 }
                 
         except Exception as e:
