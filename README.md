@@ -6,7 +6,7 @@ Welcome to the PayRetailersUAB project! This platform is designed to provide int
 
 Check out our demo video to see the platform in action:
 
-[![PayRetailersUAB Demo](https://img.youtube.com/vi/Bv0zGrCI2Rs/0.jpg)](
+[![PayRetailersUAB Demo](https://img.youtube.com/vi/Bv0zGrCI2Rs/0.jpg)](https://youtu.be/Bv0zGrCI2Rs)
 
 ## Project Structure
 
